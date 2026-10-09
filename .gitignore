@@ -1,0 +1,154 @@
+
+# ============================================================
+# ServiceEvidence - Git Ignore
+# Kotlin + Spring Boot + Gradle + PostgreSQL + Docker
+# ============================================================
+
+# ------------------------------------------------------------
+# Gradle
+# ------------------------------------------------------------
+.gradle/
+**/.gradle/
+**/build/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ------------------------------------------------------------
+# Java / Kotlin
+# ------------------------------------------------------------
+*.class
+*.log
+*.hprof
+hs_err_pid*
+replay_pid*
+
+# ------------------------------------------------------------
+# IntelliJ IDEA / JetBrains
+# ------------------------------------------------------------
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+.kotlin/
+
+# ------------------------------------------------------------
+# VS Code
+# ------------------------------------------------------------
+.vscode/
+
+# ------------------------------------------------------------
+# macOS
+# ------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ------------------------------------------------------------
+# Windows
+# ------------------------------------------------------------
+Thumbs.db
+Desktop.ini
+
+# ------------------------------------------------------------
+# Environment variables and local secrets
+# ------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!.env.sample
+
+application-local.yml
+application-local.yaml
+application-local.properties
+
+**/application-local.yml
+**/application-local.yaml
+**/application-local.properties
+
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# ------------------------------------------------------------
+# ServiceEvidence - Private evidence storage
+# Photographs, signatures and uploaded documents
+# ------------------------------------------------------------
+/backend/private-evidence/
+/private-evidence/
+
+# ------------------------------------------------------------
+# ServiceEvidence - Generated integration test results
+# ------------------------------------------------------------
+/serviceevidence-test-results/
+/backend/serviceevidence-test-results/
+
+# ------------------------------------------------------------
+# Temporary files
+# ------------------------------------------------------------
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+.cache/
+tmp/
+temp/
+
+# ------------------------------------------------------------
+# Logs
+# ------------------------------------------------------------
+logs/
+**/logs/
+*.log.*
+
+# ------------------------------------------------------------
+# Test and coverage reports
+# ------------------------------------------------------------
+coverage/
+test-results/
+**/test-results/
+jacoco/
+**/jacoco/
+
+# ------------------------------------------------------------
+# Docker local overrides
+# ------------------------------------------------------------
+docker-compose.override.yml
+docker-compose.override.yaml
+compose.override.yml
+compose.override.yaml
+
+# ------------------------------------------------------------
+# Local database exports
+# ------------------------------------------------------------
+*.sql.gz
+*.dump
+*.backup
+
+# ------------------------------------------------------------
+# Frontend (React / TypeScript / Vite)
+# For the future ServiceEvidence admin dashboard
+# ------------------------------------------------------------
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.next/
+.vite/
+*.tsbuildinfo
+
+# ------------------------------------------------------------
+# Package manager logs
+# ------------------------------------------------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
