@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Shield01 } from '@untitledui/icons';
 import { auth, setAccessToken, type User } from '../../api';
 import { Alert, Brand, Button, Field } from '../../components/ui/primitives';
@@ -50,6 +51,7 @@ export function Login({ onLogin }: LoginProps) {
             <main className="auth-main">
                 <form className="login-form" onSubmit={submit}>
                     <div className="mobile-brand"><Brand /></div>
+                    <Link className="login-back-home" to="/">← Volver al inicio</Link>
                     <div className="login-symbol"><Shield01 size={25} /></div>
                     <h1>Bienvenido de nuevo</h1>
                     <p className="muted">Ingresa tus credenciales para continuar.</p>

@@ -6,10 +6,10 @@ import { Brand, Button } from '../ui/primitives';
 import { Customers, Dashboard, Notifications, Orders } from '../../features/operations/OperationsPages';
 
 const menu = [
-    { to: '/', label: 'Resumen', icon: Home01 },
-    { to: '/orders', label: 'Órdenes de trabajo', icon: ClipboardCheck },
-    { to: '/customers', label: 'Clientes', icon: Users01 },
-    { to: '/notifications', label: 'Notificaciones', icon: Bell01 },
+    { to: '/app', label: 'Resumen', icon: Home01 },
+    { to: '/app/orders', label: 'Órdenes de trabajo', icon: ClipboardCheck },
+    { to: '/app/customers', label: 'Clientes', icon: Users01 },
+    { to: '/app/notifications', label: 'Notificaciones', icon: Bell01 },
 ];
 
 export function Shell({ user, tenant, onLogout, onSwitch }: { user: User; tenant: string; onLogout: () => void; onSwitch?: () => void }) {

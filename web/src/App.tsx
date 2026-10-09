@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { auth, getAccessToken, setAccessToken, type User } from './api';
 import { Login } from './features/auth/Login';
+import { LandingPage } from './features/marketing/LandingPage';
 import { AdminChoice, PlatformDashboard, TenantPicker } from './features/platform/PlatformPages';
 import { Shell } from './components/layout/Shell';
 
 type Mode = 'choice' | 'picker' | 'platform' | 'tenant';
 type SelectedTenant = { id: string; name: string };
 
-/** EN: Coordinates the authenticated user and tenant context.
- *  ES: Coordina la sesión y el contexto de empresa seleccionado.
+/** EN: Separates public pages from authenticated tenant/platform contexts.
+ *  ES: Separa las páginas públicas de los contextos autenticados.
  */
 export default function App() {
     const [user, setUser] = useState<User | null>(null);
@@ -19,6 +20,7 @@ export default function App() {
     const [baseToken, setBaseToken] = useState<string | null>(null);
     const queryClient = useQueryClient();
     const navigate = useNavigate();
+    const authenticated = Boolean(user && getAccessToken());
 
     function logout() {
         setAccessToken(null);
@@ -35,7 +37,7 @@ export default function App() {
         setTenant(null);
         setMode(next);
         queryClient.clear();
-        navigate('/');
+        navigate(next === 'platform' ? '/platform' : '/select-tenant');
     }
 
     async function handleLogin(token: string, authenticatedUser: User) {
@@ -44,6 +46,7 @@ export default function App() {
         setTenant(null);
         setMode(authenticatedUser.platformAdmin ? 'choice' : 'picker');
         queryClient.clear();
+        navigate('/select-tenant');
     }
 
     async function selectTenant(id: string, name: string) {
@@ -53,48 +56,59 @@ export default function App() {
         setTenant({ id, name });
         setMode('tenant');
         queryClient.clear();
-        navigate('/');
-    }
-
-    if (!user || !getAccessToken()) {
-        return <Login onLogin={handleLogin} />;
-    }
-
-    if (user.platformAdmin && mode === 'choice') {
-        return (
-            <AdminChoice
-                onGlobal={() => switchContext('platform')}
-                onTenant={() => switchContext('picker')}
-                onLogout={logout}
-            />
-        );
-    }
-
-    if (user.platformAdmin && mode === 'platform') {
-        return (
-            <PlatformDashboard
-                onChooseTenant={() => switchContext('picker')}
-                onLogout={logout}
-            />
-        );
-    }
-
-    if (mode === 'picker' || !tenant) {
-        return (
-            <TenantPicker
-                isAdmin={user.platformAdmin}
-                onBack={user.platformAdmin ? () => switchContext('choice') : undefined}
-                onSelected={selectTenant}
-            />
-        );
+        navigate('/app');
     }
 
     return (
-        <Shell
-            user={user}
-            tenant={tenant.name}
-            onLogout={logout}
-            onSwitch={user.platformAdmin ? () => switchContext('choice') : undefined}
-        />
+        <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route
+                path="/login"
+                element={authenticated
+                    ? <Navigate to={mode === 'tenant' ? '/app' : '/select-tenant'} replace />
+                    : <Login onLogin={handleLogin} />}
+            />
+            <Route
+                path="/select-tenant"
+                element={!authenticated
+                    ? <Navigate to="/login" replace />
+                    : user!.platformAdmin && mode === 'choice'
+                        ? <AdminChoice
+                            onGlobal={() => switchContext('platform')}
+                            onTenant={() => switchContext('picker')}
+                            onLogout={logout}
+                        />
+                        : <TenantPicker
+                            isAdmin={user!.platformAdmin}
+                            onBack={user!.platformAdmin ? () => switchContext('choice') : undefined}
+                            onSelected={selectTenant}
+                        />}
+            />
+            <Route
+                path="/platform"
+                element={!authenticated
+                    ? <Navigate to="/login" replace />
+                    : !user!.platformAdmin
+                        ? <Navigate to="/select-tenant" replace />
+                        : <PlatformDashboard
+                            onChooseTenant={() => switchContext('picker')}
+                            onLogout={logout}
+                        />}
+            />
+            <Route
+                path="/app/*"
+                element={!authenticated
+                    ? <Navigate to="/login" replace />
+                    : !tenant
+                        ? <Navigate to="/select-tenant" replace />
+                        : <Shell
+                            user={user!}
+                            tenant={tenant.name}
+                            onLogout={logout}
+                            onSwitch={user!.platformAdmin ? () => switchContext('choice') : undefined}
+                        />}
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
     );
 }
