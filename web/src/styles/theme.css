@@ -1,0 +1,16 @@
+/* EN: ServiceEvidence brand palette. ES: Paleta oficial del producto. */
+@theme {
+  --color-brand-50: #fcf4f2;
+  --color-brand-100: #f4e3cc;
+  --color-brand-200: #eac6c4;
+  --color-brand-300: #c6848c;
+  --color-brand-400: #c57e7f;
+  --color-brand-500: #a56464;
+  --color-brand-600: #94353f;
+  --color-brand-700: #830423;
+  --color-brand-800: #59090e;
+  --color-brand-900: #3d070b;
+  --color-warm-400: #a4947c;
+  --color-warm-500: #9c8c74;
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}

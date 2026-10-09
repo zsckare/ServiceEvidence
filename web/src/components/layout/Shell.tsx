@@ -1,0 +1,63 @@
+import { useState } from 'react';
+import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
+import { Bell01, Building07, ClipboardCheck, Home01, LogOut01, Menu01, Users01, XClose } from '@untitledui/icons';
+import type { User } from '../../api';
+import { Brand, Button } from '../ui/primitives';
+import { Customers, Dashboard, Notifications, Orders } from '../../features/operations/OperationsPages';
+
+const menu = [
+    { to: '/', label: 'Resumen', icon: Home01 },
+    { to: '/orders', label: 'Órdenes de trabajo', icon: ClipboardCheck },
+    { to: '/customers', label: 'Clientes', icon: Users01 },
+    { to: '/notifications', label: 'Notificaciones', icon: Bell01 },
+];
+
+export function Shell({ user, tenant, onLogout, onSwitch }: { user: User; tenant: string; onLogout: () => void; onSwitch?: () => void }) {
+  const [open, setOpen] = useState(false);
+  const sidebar = <>
+      <Brand />
+      <div className="sidebar-tenant">
+      <span>EMPRESA ACTUAL</span>
+      <strong>
+      <Building07 size={17} /> {tenant}</strong>
+      </div>
+      <nav className="side-links">
+      <div className="nav-label">GENERAL</div>{menu.map(item => <NavLink end key={item.to} to={item.to} className={({ isActive }) => `nav-item ${isActive ? 'nav-item--active' : ''}`} onClick={() => setOpen(false)}>
+      <item.icon size={19} />{item.label}</NavLink>)}</nav>
+      <div className="sidebar-bottom">
+      <div className="user-chip">
+      <div className="user-avatar">{user.fullName.charAt(0).toUpperCase()}</div>
+      <div>
+      <strong>{user.fullName}</strong>
+      <small>{user.email}</small>
+      </div>
+      </div>{onSwitch && <Button variant="ghost" onPress={onSwitch}>
+      <Building07 size={18} /> Cambiar contexto</Button>}<Button variant="ghost" onPress={onLogout}>
+      <LogOut01 size={18} /> Cerrar sesión</Button>
+      </div>
+      </>;
+  return <div className="workspace">
+      <aside className="sidebar sidebar--desktop">{sidebar}</aside>{open && <div className="mobile-overlay" onClick={() => setOpen(false)}>
+      <aside className="sidebar sidebar--mobile" onClick={e => e.stopPropagation()}>{sidebar}</aside>
+      </div>}<div className="content-column">
+      <header className="topbar">
+      <Button variant="ghost" className="mobile-menu" onPress={() => setOpen(true)} aria-label="Abrir menú">
+      <Menu01 size={22} />
+      </Button>
+      <span className="topbar-location">
+      <Building07 size={16} /> {tenant}</span>
+      <div className="topbar-user">{user.fullName}</div>{open && <Button variant="ghost" className="mobile-menu" onPress={() => setOpen(false)} aria-label="Cerrar menú">
+      <XClose size={20} />
+      </Button>}</header>
+      <main className="main-content">
+      <Routes>
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/orders" element={<Orders />} />
+      <Route path="/customers" element={<Customers />} />
+      <Route path="/notifications" element={<Notifications />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      </main>
+      </div>
+      </div>;
+}

@@ -1,24 +1,100 @@
 import { useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link as RouterLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { Alert, AppBar, Box, Button, Card, CardContent, Chip, CircularProgress, Container, Divider, Drawer, IconButton, List, ListItemButton, ListItemText, MenuItem, Select, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Toolbar, Typography } from '@mui/material';
-import { DashboardOutlined, AssignmentOutlined, PeopleOutline, NotificationsOutlined, Menu as MenuIcon, LogoutOutlined } from '@mui/icons-material';
-import { auth, getAccessToken, request, setAccessToken, type Customer, type Notification, type Page, type User, type WorkOrder } from './api';
-const width=240;
-const links=[{path:'/',label:'Dashboard',icon:<DashboardOutlined/>},{path:'/orders',label:'Órdenes',icon:<AssignmentOutlined/>},{path:'/customers',label:'Clientes',icon:<PeopleOutline/>},{path:'/notifications',label:'Notificaciones',icon:<NotificationsOutlined/>}];
-function Login({onLogin}:{onLogin:(token:string,user:User)=>Promise<void>}){
- const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
- async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setError('');try{const pair=await auth.login(email,password);setAccessToken(pair.accessToken);const user=await auth.me();await onLogin(pair.accessToken,user);}catch(e){setAccessToken(null);setError(e instanceof Error?e.message:'Error de autenticación');}finally{setBusy(false);}}
- return <Container maxWidth="sm" sx={{minHeight:'100vh',display:'grid',placeItems:'center'}}><Card sx={{width:'100%',p:{xs:1,sm:3},boxShadow:4}}><CardContent><Typography variant="h4" fontWeight={800} color="primary">ServiceEvidence</Typography><Typography color="text.secondary" sx={{mb:4}}>Plataforma de operaciones y evidencia de servicio</Typography><Stack component="form" onSubmit={submit} spacing={2}><TextField label="Correo electrónico" type="email" autoComplete="username" required value={email} onChange={e=>setEmail(e.target.value)}/><TextField label="Contraseña" type="password" autoComplete="current-password" required value={password} onChange={e=>setPassword(e.target.value)}/>{error&&<Alert severity="error">{error}</Alert>}<Button type="submit" variant="contained" size="large" disabled={busy}>{busy?'Ingresando…':'Iniciar sesión'}</Button></Stack></CardContent></Card></Container>;
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { auth, getAccessToken, setAccessToken, type User } from './api';
+import { Login } from './features/auth/Login';
+import { AdminChoice, PlatformDashboard, TenantPicker } from './features/platform/PlatformPages';
+import { Shell } from './components/layout/Shell';
+
+type Mode = 'choice' | 'picker' | 'platform' | 'tenant';
+type SelectedTenant = { id: string; name: string };
+
+/** EN: Coordinates the authenticated user and tenant context.
+ *  ES: Coordina la sesión y el contexto de empresa seleccionado.
+ */
+export default function App() {
+    const [user, setUser] = useState<User | null>(null);
+    const [tenant, setTenant] = useState<SelectedTenant | null>(null);
+    const [mode, setMode] = useState<Mode>('choice');
+    const [baseToken, setBaseToken] = useState<string | null>(null);
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
+
+    function logout() {
+        setAccessToken(null);
+        setBaseToken(null);
+        setUser(null);
+        setTenant(null);
+        setMode('choice');
+        queryClient.clear();
+        navigate('/');
+    }
+
+    function switchContext(next: 'choice' | 'picker' | 'platform') {
+        if (baseToken) setAccessToken(baseToken);
+        setTenant(null);
+        setMode(next);
+        queryClient.clear();
+        navigate('/');
+    }
+
+    async function handleLogin(token: string, authenticatedUser: User) {
+        setUser(authenticatedUser);
+        setBaseToken(token);
+        setTenant(null);
+        setMode(authenticatedUser.platformAdmin ? 'choice' : 'picker');
+        queryClient.clear();
+    }
+
+    async function selectTenant(id: string, name: string) {
+        if (baseToken) setAccessToken(baseToken);
+        const response = await auth.select(id);
+        setAccessToken(response.accessToken);
+        setTenant({ id, name });
+        setMode('tenant');
+        queryClient.clear();
+        navigate('/');
+    }
+
+    if (!user || !getAccessToken()) {
+        return <Login onLogin={handleLogin} />;
+    }
+
+    if (user.platformAdmin && mode === 'choice') {
+        return (
+            <AdminChoice
+                onGlobal={() => switchContext('platform')}
+                onTenant={() => switchContext('picker')}
+                onLogout={logout}
+            />
+        );
+    }
+
+    if (user.platformAdmin && mode === 'platform') {
+        return (
+            <PlatformDashboard
+                onChooseTenant={() => switchContext('picker')}
+                onLogout={logout}
+            />
+        );
+    }
+
+    if (mode === 'picker' || !tenant) {
+        return (
+            <TenantPicker
+                isAdmin={user.platformAdmin}
+                onBack={user.platformAdmin ? () => switchContext('choice') : undefined}
+                onSelected={selectTenant}
+            />
+        );
+    }
+
+    return (
+        <Shell
+            user={user}
+            tenant={tenant.name}
+            onLogout={logout}
+            onSwitch={user.platformAdmin ? () => switchContext('choice') : undefined}
+        />
+    );
 }
-function TenantPicker({onSelected}:{onSelected:(id:string)=>Promise<void>}){
- const tenants=useQuery({queryKey:['tenants'],queryFn:auth.tenants});const [choice,setChoice]=useState(''),[error,setError]=useState('');
- return <Container maxWidth="sm" sx={{pt:10}}><Card><CardContent><Typography variant="h5" gutterBottom>Seleccionar empresa</Typography><Typography color="text.secondary" sx={{mb:3}}>El backend exige seleccionar el contexto de empresa antes de consultar datos.</Typography>{tenants.isLoading?<CircularProgress/>:tenants.isError?<Alert severity="error">No se pudieron consultar las empresas.</Alert>:<Stack spacing={2}><Select fullWidth displayEmpty value={choice} onChange={e=>setChoice(e.target.value)}><MenuItem value="" disabled>Selecciona un tenant</MenuItem>{tenants.data?.map(id=><MenuItem key={id} value={id}>{id}</MenuItem>)}</Select>{error&&<Alert severity="error">{error}</Alert>}<Button variant="contained" disabled={!choice} onClick={()=>onSelected(choice).catch(e=>setError(String(e)))}>Continuar</Button></Stack>}</CardContent></Card></Container>;
-}
-function Orders(){const [page,setPage]=useState(0);const data=useQuery({queryKey:['orders',page],queryFn:()=>request<Page<WorkOrder>>(`/work-orders?page=${page}&size=20`)});return <Section title="Órdenes de trabajo" error={data.error} loading={data.isLoading}><TableContainer><Table size="small"><TableHead><TableRow><TableCell>Título</TableCell><TableCell>Estado</TableCell><TableCell>Prioridad</TableCell><TableCell>Creada</TableCell></TableRow></TableHead><TableBody>{data.data?.content.map(o=><TableRow key={o.id} hover><TableCell>{o.title}</TableCell><TableCell><Chip size="small" label={o.status}/></TableCell><TableCell>{o.priority}</TableCell><TableCell>{new Date(o.createdAt).toLocaleDateString('es-MX')}</TableCell></TableRow>)}</TableBody></Table></TableContainer><Stack direction="row" alignItems="center" justifyContent="end" spacing={2} mt={2}><Button disabled={page===0} onClick={()=>setPage(v=>v-1)}>Anterior</Button><Typography variant="body2">Página {page+1} / {Math.max(1,data.data?.totalPages??1)}</Typography><Button disabled={!data.data||page+1>=data.data.totalPages} onClick={()=>setPage(v=>v+1)}>Siguiente</Button></Stack></Section>}
-function Customers(){const [search,setSearch]=useState('');const data=useQuery({queryKey:['customers',search],queryFn:()=>request<Page<Customer>>(`/customers?page=0&size=100&search=${encodeURIComponent(search)}`)});return <Section title="Clientes" loading={data.isLoading} error={data.error}><TextField size="small" label="Buscar por nombre" value={search} onChange={e=>setSearch(e.target.value)} sx={{mb:2}}/><TableContainer><Table size="small"><TableHead><TableRow><TableCell>Cliente</TableCell><TableCell>Correo</TableCell><TableCell>Teléfono</TableCell><TableCell>Estado</TableCell></TableRow></TableHead><TableBody>{data.data?.content.map(c=><TableRow key={c.id}><TableCell>{c.name}</TableCell><TableCell>{c.email||'—'}</TableCell><TableCell>{c.phone||'—'}</TableCell><TableCell>{c.active?'Activo':'Inactivo'}</TableCell></TableRow>)}</TableBody></Table></TableContainer></Section>}
-function Notifications(){const qc=useQueryClient();const data=useQuery({queryKey:['notifications'],queryFn:()=>request<Notification[]>('/notifications')});async function mark(id:string){await request(`/notifications/${id}/read`,{method:'POST'});await qc.invalidateQueries({queryKey:['notifications']});}return <Section title="Notificaciones" loading={data.isLoading} error={data.error}><Stack spacing={1}>{data.data?.map(n=><Card variant="outlined" key={n.id}><CardContent><Stack direction="row" justifyContent="space-between" alignItems="center"><Box><Typography fontWeight={n.readAt?400:700}>{n.title}</Typography><Typography color="text.secondary">{n.message}</Typography></Box>{!n.readAt&&<Button onClick={()=>mark(n.id)}>Marcar leída</Button>}</Stack></CardContent></Card>)}{data.data?.length===0&&<Typography>No tienes notificaciones.</Typography>}</Stack></Section>}
-function Section({title,loading,error,children}:{title:string;loading:boolean;error:Error|null;children:React.ReactNode}){return <Card><CardContent><Typography variant="h5" fontWeight={700} gutterBottom>{title}</Typography><Divider sx={{mb:2}}/>{loading?<CircularProgress/>:error?<Alert severity="error">{error.message}</Alert>:children}</CardContent></Card>}
-function Dashboard(){const orders=useQuery({queryKey:['dashboard-orders'],queryFn:()=>request<Page<WorkOrder>>('/work-orders?page=0&size=20')});const customers=useQuery({queryKey:['dashboard-customers'],queryFn:()=>request<Page<Customer>>('/customers?page=0&size=1')});return <Box><Typography variant="h4" fontWeight={800} mb={3}>Resumen operativo</Typography><Stack direction={{xs:'column',md:'row'}} spacing={2}><Card sx={{flex:1}}><CardContent><Typography color="text.secondary">Órdenes totales</Typography><Typography variant="h3" fontWeight={700}>{orders.data?.totalElements??'—'}</Typography></CardContent></Card><Card sx={{flex:1}}><CardContent><Typography color="text.secondary">Clientes registrados</Typography><Typography variant="h3" fontWeight={700}>{customers.data?.totalElements??'—'}</Typography></CardContent></Card><Card sx={{flex:1}}><CardContent><Typography color="text.secondary">Órdenes visibles en página actual</Typography><Typography variant="h3" fontWeight={700}>{orders.data?.content.length??'—'}</Typography></CardContent></Card></Stack>{(orders.error||customers.error)&&<Alert severity="warning" sx={{mt:2}}>No se pudieron cargar todos los indicadores. Revisa los permisos del usuario.</Alert>}</Box>}
-function Shell({user,tenant,onLogout}:{user:User;tenant:string;onLogout:()=>void}){const [open,setOpen]=useState(false);const location=useLocation();const nav=useNavigate();const sidebar=<Box sx={{pt:2}}><Typography variant="h6" fontWeight={800} color="primary" px={2} mb={2}>ServiceEvidence</Typography><Divider/><List>{links.map(l=><ListItemButton key={l.path} selected={location.pathname===l.path} component={RouterLink} to={l.path} onClick={()=>setOpen(false)} sx={{gap:2}}>{l.icon}<ListItemText primary={l.label}/></ListItemButton>)}</List></Box>;return <Box sx={{display:'flex'}}><AppBar position="fixed" color="inherit" elevation={0} sx={{borderBottom:'1px solid #dfe5eb',ml:{md:`${width}px`},width:{md:`calc(100% - ${width}px)`}}}><Toolbar><IconButton sx={{display:{md:'none'},mr:1}} onClick={()=>setOpen(true)}><MenuIcon/></IconButton><Typography sx={{flex:1}} noWrap>{user.fullName} · {tenant.slice(0,8)}…</Typography><IconButton title="Cerrar sesión" onClick={onLogout}><LogoutOutlined/></IconButton></Toolbar></AppBar><Drawer variant="temporary" open={open} onClose={()=>setOpen(false)} sx={{display:{xs:'block',md:'none'},'& .MuiDrawer-paper':{width}}}>{sidebar}</Drawer><Drawer variant="permanent" sx={{display:{xs:'none',md:'block'},width,flexShrink:0,'& .MuiDrawer-paper':{width}}}>{sidebar}</Drawer><Box component="main" sx={{flexGrow:1,p:{xs:2,md:4},mt:8,minWidth:0}}><Routes><Route path="/" element={<Dashboard/>}/><Route path="/orders" element={<Orders/>}/><Route path="/customers" element={<Customers/>}/><Route path="/notifications" element={<Notifications/>}/><Route path="*" element={<Navigate to="/" replace/>}/></Routes></Box></Box>}
-export default function App(){const [user,setUser]=useState<User|null>(null),[tenant,setTenant]=useState<string|null>(null);const qc=useQueryClient();const nav=useNavigate();function logout(){setAccessToken(null);setUser(null);setTenant(null);qc.clear();nav('/');}if(!user||!getAccessToken())return <Login onLogin={async(_,u)=>{setUser(u);setTenant(null);qc.clear();}}/>;if(!tenant)return <TenantPicker onSelected={async id=>{const response=await auth.select(id);setAccessToken(response.accessToken);setTenant(id);qc.clear();nav('/');}}/>;return <Shell user={user} tenant={tenant} onLogout={logout}/>}
