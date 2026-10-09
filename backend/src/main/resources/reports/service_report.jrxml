@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="service_report" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="40" bottomMargin="40" whenNoDataType="AllSectionsNoDetail">
+    <parameter name="COMPANY" class="java.lang.String"/>
+    <parameter name="TIMEZONE" class="java.lang.String"/>
     <parameter name="ORDER_ID" class="java.lang.String"/>
     <parameter name="TITLE" class="java.lang.String"/>
     <parameter name="DESCRIPTION" class="java.lang.String"/>
@@ -12,6 +14,7 @@
     <parameter name="STARTED" class="java.lang.String"/>
     <parameter name="COMPLETED" class="java.lang.String"/>
     <parameter name="EVIDENCE_COUNT" class="java.lang.String"/>
+    <field name="image" class="java.awt.Image"/>
     <field name="kind" class="java.lang.String"/>
     <field name="id" class="java.lang.String"/>
     <field name="notes" class="java.lang.String"/>
@@ -40,20 +43,22 @@
         <textField isBlankWhenNull="true"><reportElement x="0" y="220" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Evidence items"]]></textFieldExpression></textField>
         <textField isBlankWhenNull="true"><reportElement x="110" y="220" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{EVIDENCE_COUNT}]]></textFieldExpression></textField>
     </band></groupHeader></group>
-    <title><band height="55">
-        <textField isBlankWhenNull="true"><reportElement x="0" y="0" width="515" height="32"/><textElement><font size="20" isBold="true"/></textElement><textFieldExpression><![CDATA["SERVICE REPORT"]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="0" y="35" width="515" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["Work order: " + $P{ORDER_ID}]]></textFieldExpression></textField>
+    <title><band height="85">
+        <textField isBlankWhenNull="true"><reportElement x="0" y="0" width="515" height="22" forecolor="#1F4767"/><textElement><font size="13" isBold="true"/></textElement><textFieldExpression><![CDATA[$P{COMPANY}]]></textFieldExpression></textField>
+        <textField><reportElement x="0" y="25" width="515" height="28" forecolor="#16344E"/><textElement><font size="20" isBold="true"/></textElement><textFieldExpression><![CDATA["SERVICE REPORT"]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="0" y="60" width="515" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["Work order: " + $P{ORDER_ID}]]></textFieldExpression></textField>
     </band></title>
     <pageHeader><band height="0"/></pageHeader>
     <columnHeader><band height="0"/></columnHeader>
-    <detail><band height="72">
+    <detail><band height="220">
         <textField isBlankWhenNull="true"><reportElement x="0" y="2" width="85" height="16"/><textElement><font size="10" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{kind}]]></textFieldExpression></textField>
         <textField isBlankWhenNull="true"><reportElement x="90" y="2" width="425" height="16"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$F{id}]]></textFieldExpression></textField>
         <textField isBlankWhenNull="true"><reportElement x="90" y="22" width="425" height="20"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$F{notes}]]></textFieldExpression></textField>
         <textField isBlankWhenNull="true"><reportElement x="90" y="46" width="425" height="16"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA[$F{createdAt}]]></textFieldExpression></textField>
+        <image onErrorType="Blank" scaleImage="RetainShape"><reportElement x="90" y="70" width="350" height="142"/><imageExpression class="java.awt.Image"><![CDATA[$F{image}]]></imageExpression></image>
     </band></detail>
     <pageFooter><band height="22">
-        <textField isBlankWhenNull="true"><reportElement x="0" y="2" width="515" height="16"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA["ServiceEvidence • Page " + $V{PAGE_NUMBER}]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="0" y="2" width="515" height="16"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA[$P{COMPANY} + "  |  " + $P{TIMEZONE} + "  |  Page " + $V{PAGE_NUMBER}]]></textFieldExpression></textField>
     </band></pageFooter>
     <summary><band height="0"/></summary>
 
