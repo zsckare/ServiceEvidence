@@ -1,65 +1,276 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="service_report" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="40" bottomMargin="40" whenNoDataType="AllSectionsNoDetail">
-    <parameter name="COMPANY" class="java.lang.String"/>
-    <parameter name="TIMEZONE" class="java.lang.String"/>
-    <parameter name="ORDER_ID" class="java.lang.String"/>
-    <parameter name="TITLE" class="java.lang.String"/>
-    <parameter name="DESCRIPTION" class="java.lang.String"/>
-    <parameter name="CUSTOMER" class="java.lang.String"/>
-    <parameter name="LOCATION" class="java.lang.String"/>
-    <parameter name="STATUS" class="java.lang.String"/>
-    <parameter name="PRIORITY" class="java.lang.String"/>
-    <parameter name="CREATED" class="java.lang.String"/>
-    <parameter name="SCHEDULED" class="java.lang.String"/>
-    <parameter name="STARTED" class="java.lang.String"/>
-    <parameter name="COMPLETED" class="java.lang.String"/>
-    <parameter name="EVIDENCE_COUNT" class="java.lang.String"/>
-    <field name="image" class="java.awt.Image"/>
-    <field name="kind" class="java.lang.String"/>
-    <field name="id" class="java.lang.String"/>
-    <field name="notes" class="java.lang.String"/>
-    <field name="createdAt" class="java.lang.String"/>
-    <group name="OrderDetails"><groupExpression><![CDATA[$P{ORDER_ID}]]></groupExpression><groupHeader><band height="264">
-        <textField isBlankWhenNull="true"><reportElement x="0" y="0" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Title"]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="110" y="0" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{TITLE}]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="0" y="22" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Description"]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="110" y="22" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{DESCRIPTION}]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="0" y="44" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Customer"]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="110" y="44" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{CUSTOMER}]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="0" y="66" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Location"]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="110" y="66" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{LOCATION}]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="0" y="88" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Status"]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="110" y="88" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{STATUS}]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="0" y="110" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Priority"]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="110" y="110" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{PRIORITY}]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="0" y="132" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Created"]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="110" y="132" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{CREATED}]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="0" y="154" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Scheduled"]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="110" y="154" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{SCHEDULED}]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="0" y="176" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Started"]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="110" y="176" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{STARTED}]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="0" y="198" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Completed"]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="110" y="198" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{COMPLETED}]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="0" y="220" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Evidence items"]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="110" y="220" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{EVIDENCE_COUNT}]]></textFieldExpression></textField>
-    </band></groupHeader></group>
-    <title><band height="85">
-        <textField isBlankWhenNull="true"><reportElement x="0" y="0" width="515" height="22" forecolor="#1F4767"/><textElement><font size="13" isBold="true"/></textElement><textFieldExpression><![CDATA[$P{COMPANY}]]></textFieldExpression></textField>
-        <textField><reportElement x="0" y="25" width="515" height="28" forecolor="#16344E"/><textElement><font size="20" isBold="true"/></textElement><textFieldExpression><![CDATA["SERVICE REPORT"]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="0" y="60" width="515" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["Work order: " + $P{ORDER_ID}]]></textFieldExpression></textField>
-    </band></title>
-    <pageHeader><band height="0"/></pageHeader>
-    <columnHeader><band height="0"/></columnHeader>
-    <detail><band height="220">
-        <textField isBlankWhenNull="true"><reportElement x="0" y="2" width="85" height="16"/><textElement><font size="10" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{kind}]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="90" y="2" width="425" height="16"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$F{id}]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="90" y="22" width="425" height="20"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$F{notes}]]></textFieldExpression></textField>
-        <textField isBlankWhenNull="true"><reportElement x="90" y="46" width="425" height="16"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA[$F{createdAt}]]></textFieldExpression></textField>
-        <image onErrorType="Blank" scaleImage="RetainShape"><reportElement x="90" y="70" width="350" height="142"/><imageExpression class="java.awt.Image"><![CDATA[$F{image}]]></imageExpression></image>
-    </band></detail>
-    <pageFooter><band height="22">
-        <textField isBlankWhenNull="true"><reportElement x="0" y="2" width="515" height="16"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA[$P{COMPANY} + "  |  " + $P{TIMEZONE} + "  |  Page " + $V{PAGE_NUMBER}]]></textFieldExpression></textField>
-    </band></pageFooter>
-    <summary><band height="0"/></summary>
-
+    <parameter name="ORDER_ID" class="java.lang.String" />
+    <parameter name="TITLE" class="java.lang.String" />
+    <parameter name="DESCRIPTION" class="java.lang.String" />
+    <parameter name="CUSTOMER" class="java.lang.String" />
+    <parameter name="LOCATION" class="java.lang.String" />
+    <parameter name="STATUS" class="java.lang.String" />
+    <parameter name="PRIORITY" class="java.lang.String" />
+    <parameter name="CREATED" class="java.lang.String" />
+    <parameter name="SCHEDULED" class="java.lang.String" />
+    <parameter name="STARTED" class="java.lang.String" />
+    <parameter name="COMPLETED" class="java.lang.String" />
+    <parameter name="EVIDENCE_COUNT" class="java.lang.String" />
+    <parameter name="COMPANY" class="java.lang.String" />
+    <parameter name="TIMEZONE" class="java.lang.String" />
+    <parameter name="LOGO" class="java.awt.Image" />
+    <field name="kind" class="java.lang.String" />
+    <field name="id" class="java.lang.String" />
+    <field name="notes" class="java.lang.String" />
+    <field name="createdAt" class="java.lang.String" />
+    <field name="image" class="java.awt.Image" />
+    <group name="OrderDetails">
+        <groupExpression>$P{ORDER_ID}</groupExpression>
+        <groupHeader>
+            <band height="264">
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="0" width="105" height="18" />
+                    <textElement>
+                        <font size="9" isBold="true" />
+                    </textElement>
+                    <textFieldExpression>"Title"</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="110" y="0" width="405" height="18" />
+                    <textElement>
+                        <font size="9" />
+                    </textElement>
+                    <textFieldExpression>$P{TITLE}</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="22" width="105" height="18" />
+                    <textElement>
+                        <font size="9" isBold="true" />
+                    </textElement>
+                    <textFieldExpression>"Description"</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="110" y="22" width="405" height="18" />
+                    <textElement>
+                        <font size="9" />
+                    </textElement>
+                    <textFieldExpression>$P{DESCRIPTION}</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="44" width="105" height="18" />
+                    <textElement>
+                        <font size="9" isBold="true" />
+                    </textElement>
+                    <textFieldExpression>"Customer"</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="110" y="44" width="405" height="18" />
+                    <textElement>
+                        <font size="9" />
+                    </textElement>
+                    <textFieldExpression>$P{CUSTOMER}</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="66" width="105" height="18" />
+                    <textElement>
+                        <font size="9" isBold="true" />
+                    </textElement>
+                    <textFieldExpression>"Location"</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="110" y="66" width="405" height="18" />
+                    <textElement>
+                        <font size="9" />
+                    </textElement>
+                    <textFieldExpression>$P{LOCATION}</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="88" width="105" height="18" />
+                    <textElement>
+                        <font size="9" isBold="true" />
+                    </textElement>
+                    <textFieldExpression>"Status"</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="110" y="88" width="405" height="18" />
+                    <textElement>
+                        <font size="9" />
+                    </textElement>
+                    <textFieldExpression>$P{STATUS}</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="110" width="105" height="18" />
+                    <textElement>
+                        <font size="9" isBold="true" />
+                    </textElement>
+                    <textFieldExpression>"Priority"</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="110" y="110" width="405" height="18" />
+                    <textElement>
+                        <font size="9" />
+                    </textElement>
+                    <textFieldExpression>$P{PRIORITY}</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="132" width="105" height="18" />
+                    <textElement>
+                        <font size="9" isBold="true" />
+                    </textElement>
+                    <textFieldExpression>"Created"</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="110" y="132" width="405" height="18" />
+                    <textElement>
+                        <font size="9" />
+                    </textElement>
+                    <textFieldExpression>$P{CREATED}</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="154" width="105" height="18" />
+                    <textElement>
+                        <font size="9" isBold="true" />
+                    </textElement>
+                    <textFieldExpression>"Scheduled"</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="110" y="154" width="405" height="18" />
+                    <textElement>
+                        <font size="9" />
+                    </textElement>
+                    <textFieldExpression>$P{SCHEDULED}</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="176" width="105" height="18" />
+                    <textElement>
+                        <font size="9" isBold="true" />
+                    </textElement>
+                    <textFieldExpression>"Started"</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="110" y="176" width="405" height="18" />
+                    <textElement>
+                        <font size="9" />
+                    </textElement>
+                    <textFieldExpression>$P{STARTED}</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="198" width="105" height="18" />
+                    <textElement>
+                        <font size="9" isBold="true" />
+                    </textElement>
+                    <textFieldExpression>"Completed"</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="110" y="198" width="405" height="18" />
+                    <textElement>
+                        <font size="9" />
+                    </textElement>
+                    <textFieldExpression>$P{COMPLETED}</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="0" y="220" width="105" height="18" />
+                    <textElement>
+                        <font size="9" isBold="true" />
+                    </textElement>
+                    <textFieldExpression>"Evidence items"</textFieldExpression>
+                </textField>
+                <textField isBlankWhenNull="true">
+                    <reportElement x="110" y="220" width="405" height="18" />
+                    <textElement>
+                        <font size="9" />
+                    </textElement>
+                    <textFieldExpression>$P{EVIDENCE_COUNT}</textFieldExpression>
+                </textField>
+            </band>
+        </groupHeader>
+    </group>
+    <title>
+        <band height="90">
+            <image scaleImage="RetainShape" onErrorType="Blank" isLazy="false">
+                <reportElement x="0" y="0" width="105" height="56" />
+                <imageExpression class="java.awt.Image">$P{LOGO}</imageExpression>
+            </image>
+            <textField isBlankWhenNull="true">
+                <reportElement x="115" y="0" width="400" height="22" forecolor="#17324D" />
+                <textElement>
+                    <font size="15" isBold="true" />
+                </textElement>
+                <textFieldExpression>$P{COMPANY}</textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="115" y="25" width="400" height="28" forecolor="#17324D" />
+                <textElement>
+                    <font size="20" isBold="true" />
+                </textElement>
+                <textFieldExpression>"SERVICE REPORT"</textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="66" width="515" height="18" />
+                <textElement>
+                    <font size="9" isBold="false" />
+                </textElement>
+                <textFieldExpression>"Work order: " + $P{ORDER_ID}</textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <pageHeader>
+        <band height="0" />
+    </pageHeader>
+    <columnHeader>
+        <band height="0" />
+    </columnHeader>
+    <detail>
+        <band height="204">
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="2" width="85" height="16" />
+                <textElement>
+                    <font size="10" isBold="true" />
+                </textElement>
+                <textFieldExpression>$F{kind}</textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="90" y="2" width="425" height="16" />
+                <textElement>
+                    <font size="9" />
+                </textElement>
+                <textFieldExpression>$F{id}</textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="90" y="22" width="425" height="20" />
+                <textElement>
+                    <font size="9" />
+                </textElement>
+                <textFieldExpression>$F{notes}</textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="90" y="46" width="425" height="16" />
+                <textElement>
+                    <font size="8" />
+                </textElement>
+                <textFieldExpression>$F{createdAt}</textFieldExpression>
+            </textField>
+            <image scaleImage="RetainShape" onErrorType="Blank" isLazy="false">
+                <reportElement x="90" y="70" width="330" height="125" />
+                <imageExpression class="java.awt.Image">$F{image}</imageExpression>
+            </image>
+        </band>
+    </detail>
+    <pageFooter>
+        <band height="26">
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="2" width="370" height="18" />
+                <textElement>
+                    <font size="8" isBold="false" />
+                </textElement>
+                <textFieldExpression>$P{COMPANY} + " | " + $P{TIMEZONE}</textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="375" y="2" width="140" height="18" />
+                <textElement>
+                    <font size="8" isBold="false" />
+                </textElement>
+                <textFieldExpression>"Page " + $V{PAGE_NUMBER}</textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+    <summary>
+        <band height="0" />
+    </summary>
 </jasperReport>
