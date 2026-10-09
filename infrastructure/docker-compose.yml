@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: serviceevidence
+      POSTGRES_USER: serviceevidence
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-serviceevidence_dev}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - serviceevidence_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U serviceevidence -d serviceevidence"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+volumes:
+  serviceevidence_pgdata:
