@@ -57,7 +57,7 @@ export function Shell({ user, tenant, onLogout, onSwitch }: { user: User; tenant
       <Routes>
       <Route path="/" element={<Dashboard />} />
       <Route path="/orders" element={<OrdersPage />} />
-      <Route path="/orders/:orderId" element={<OrderDetailPage />} />
+      <Route path="/orders/:orderId" element={<OrderDetailPage user={user} />} />
       <Route path="/customers" element={<CustomersPage />} />
       <Route path="/customers/:customerId/locations" element={<LocationsPage />} />
       <Route path="/notifications" element={<Notifications />} />

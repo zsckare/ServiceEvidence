@@ -2,13 +2,16 @@ import { useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-    downloadPrivateFile, request,
+    downloadPrivateFile, request, type TenantMember,
     type Evidence, type WorkOrder, type WorkOrderEvent,
 } from '../../api';
-import { Alert, Button, Empty, ErrorOrLoading, Header, Panel } from '../../components/ui/primitives';
+import { Alert, Button, ErrorOrLoading, Header, Panel } from '../../components/ui/primitives';
 import { OperationError } from './shared';
+import { EvidenceGallery } from './EvidenceGallery';
+import { AssignmentsPanel } from './AssignmentsPanel';
+import type { User } from '../../api';
 
-export function OrderDetailPage() {
+export function OrderDetailPage({ user }: { user: User }) {
     const { orderId = '' } = useParams();
     const queryClient = useQueryClient();
     const [status, setStatus] = useState('');
@@ -16,6 +19,15 @@ export function OrderDetailPage() {
     const [kind, setKind] = useState('PHOTO');
     const [notes, setNotes] = useState('');
     const [actionError, setActionError] = useState<string | null>(null);
+
+    const members = useQuery({
+        queryKey: ['tenant-members'],
+        queryFn: () => request<TenantMember[]>('/users'),
+        retry: false,
+    });
+    const canManageAssignments = user.platformAdmin || members.data?.some(
+        (member) => member.id === user.id && member.role === 'TENANT_ADMIN',
+    ) === true;
 
     const order = useQuery({
         queryKey: ['order', orderId],
@@ -29,6 +41,13 @@ export function OrderDetailPage() {
         queryKey: ['order-events', orderId],
         queryFn: () => request<WorkOrderEvent[]>(`/work-orders/${orderId}/events`),
     });
+
+    const nextStatuses: Record<string, string[]> = {
+        DRAFT: ['SCHEDULED', 'CANCELLED'],
+        SCHEDULED: ['IN_PROGRESS', 'CANCELLED'],
+        IN_PROGRESS: ['COMPLETED', 'CANCELLED'],
+    };
+    const availableStatuses = nextStatuses[order.data?.status ?? ''] ?? [];
 
     const updateStatus = useMutation({
         mutationFn: () => request<WorkOrder>(`/work-orders/${orderId}/status`, {
@@ -100,18 +119,20 @@ export function OrderDetailPage() {
                             <div><span>Prioridad</span><strong>{order.data.priority}</strong></div>
                             <div><span>Creación</span><strong>{new Date(order.data.createdAt).toLocaleString('es-MX')}</strong></div>
                         </div>
+                        {availableStatuses.length > 0 && (
                         <form className="operation-inline-form" onSubmit={(event) => { event.preventDefault(); updateStatus.mutate(); }}>
                             <label className="operation-field">
                                 <span>Cambiar estado</span>
                                 <select className="se-input" required value={status} onChange={(e) => setStatus(e.target.value)}>
                                     <option value="">Seleccionar estado</option>
-                                    {['DRAFT', 'SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].map((item) => (
+                                    {availableStatuses.map((item) => (
                                         <option key={item} value={item}>{item}</option>
                                     ))}
                                 </select>
                             </label>
                             <Button type="submit" isDisabled={!status || updateStatus.isPending}>Actualizar</Button>
                         </form>
+                        )}
                         <OperationError error={updateStatus.error} />
                     </Panel>
                 )}
@@ -119,26 +140,14 @@ export function OrderDetailPage() {
             <Panel>
                 <h2>Evidencias</h2>
                 <ErrorOrLoading loading={evidence.isLoading} error={evidence.error}>
-                    {evidence.data?.length === 0 ? <Empty>Aún no hay evidencias.</Empty> : (
-                        <div className="operation-evidence-grid">
-                            {evidence.data?.map((item) => (
-                                <div className="operation-evidence" key={item.id}>
-                                    <div className="operation-evidence-icon">{item.kind === 'SIGNATURE' ? '✍' : '▧'}</div>
-                                    <strong>{item.kind}</strong>
-                                    <span>{item.notes || new Date(item.createdAt).toLocaleString('es-MX')}</span>
-                                    <Button
-                                        variant="secondary"
-                                        onPress={() => download(
-                                            `/work-orders/${orderId}/files/${item.id}`,
-                                            `evidencia-${item.id}`,
-                                        )}
-                                    >
-                                        Descargar
-                                    </Button>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                    <EvidenceGallery
+                        orderId={orderId}
+                        items={evidence.data ?? []}
+                        onDownload={(item) => download(
+                            `/work-orders/${orderId}/files/${item.id}`,
+                            `evidencia-${item.id}.${item.contentType.split('/')[1] ?? 'bin'}`,
+                        )}
+                    />
                 </ErrorOrLoading>
                 {order.data && !['COMPLETED', 'CANCELLED'].includes(order.data.status) && (
                     <form className="operation-upload" onSubmit={submitUpload}>
@@ -171,6 +180,12 @@ export function OrderDetailPage() {
                     </form>
                 )}
             </Panel>
+            {canManageAssignments && order.data && (
+                <AssignmentsPanel
+                    orderId={orderId}
+                    closed={['COMPLETED', 'CANCELLED'].includes(order.data.status)}
+                />
+            )}
             <Panel>
                 <h2>Historial de actividad</h2>
                 <ErrorOrLoading loading={events.isLoading} error={events.error}>

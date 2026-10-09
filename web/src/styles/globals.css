@@ -934,3 +934,70 @@ tr:last-child td {
         white-space: normal;
     }
 }
+
+
+/* EN: Private evidence gallery and technician assignment cards.
+   ES: Galería privada y tarjetas de asignación de técnicos. */
+.evidence-thumbnail,
+.evidence-placeholder {
+    width: 100%;
+    height: 165px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #f4e3cc;
+}
+
+.evidence-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    text-align: center;
+    color: #59090e;
+    font-size: 13px;
+}
+
+.assignment-list {
+    display: grid;
+    gap: 12px;
+    margin: 18px 0;
+}
+
+.assignment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid #eadbd7;
+    border-radius: 12px;
+}
+
+.assignment-item > div {
+    display: grid;
+    gap: 4px;
+}
+
+.assignment-item small {
+    color: #796e6b;
+}
+
+.assignment-form {
+    display: flex;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.assignment-form .operation-field {
+    min-width: min(100%, 260px);
+}
+
+@media (max-width: 640px) {
+    .assignment-item,
+    .assignment-form {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

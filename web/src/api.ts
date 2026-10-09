@@ -152,3 +152,32 @@ export async function downloadPrivateFile(path: string, filename: string): Promi
     anchor.remove();
     window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
+
+
+/** EN: Tenant membership returned by /users. ES: Miembro del tenant. */
+export type TenantMember = {
+    id: string;
+    email: string;
+    fullName: string;
+    role: 'TENANT_ADMIN' | 'SUPERVISOR' | 'TECHNICIAN';
+    enabled: boolean;
+};
+
+export type WorkOrderAssignment = {
+    id: string;
+    technicianId: string;
+    primary: boolean;
+};
+
+/** EN: Fetches private evidence with the JWT header, never a URL token.
+ * ES: Obtiene evidencia privada con JWT en encabezados, no en la URL.
+ */
+export async function fetchPrivateBlob(path: string, signal?: AbortSignal): Promise<Blob> {
+    const headers = new Headers();
+    const accessToken = getAccessToken();
+    if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`);
+
+    const response = await fetch(`/api/v1${path}`, { headers, signal });
+    if (!response.ok) throw new Error(`No se pudo obtener la evidencia (${response.status}).`);
+    return response.blob();
+}
