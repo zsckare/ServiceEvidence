@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="service_report" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="40" bottomMargin="40" whenNoDataType="AllSectionsNoDetail">
+    <parameter name="ORDER_ID" class="java.lang.String"/>
+    <parameter name="TITLE" class="java.lang.String"/>
+    <parameter name="DESCRIPTION" class="java.lang.String"/>
+    <parameter name="CUSTOMER" class="java.lang.String"/>
+    <parameter name="LOCATION" class="java.lang.String"/>
+    <parameter name="STATUS" class="java.lang.String"/>
+    <parameter name="PRIORITY" class="java.lang.String"/>
+    <parameter name="CREATED" class="java.lang.String"/>
+    <parameter name="SCHEDULED" class="java.lang.String"/>
+    <parameter name="STARTED" class="java.lang.String"/>
+    <parameter name="COMPLETED" class="java.lang.String"/>
+    <parameter name="EVIDENCE_COUNT" class="java.lang.String"/>
+    <field name="kind" class="java.lang.String"/>
+    <field name="id" class="java.lang.String"/>
+    <field name="notes" class="java.lang.String"/>
+    <field name="createdAt" class="java.lang.String"/>
+    <group name="OrderDetails"><groupExpression><![CDATA[$P{ORDER_ID}]]></groupExpression><groupHeader><band height="264">
+        <textField isBlankWhenNull="true"><reportElement x="0" y="0" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Title"]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="110" y="0" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{TITLE}]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="0" y="22" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Description"]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="110" y="22" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{DESCRIPTION}]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="0" y="44" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Customer"]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="110" y="44" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{CUSTOMER}]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="0" y="66" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Location"]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="110" y="66" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{LOCATION}]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="0" y="88" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Status"]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="110" y="88" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{STATUS}]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="0" y="110" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Priority"]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="110" y="110" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{PRIORITY}]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="0" y="132" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Created"]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="110" y="132" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{CREATED}]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="0" y="154" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Scheduled"]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="110" y="154" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{SCHEDULED}]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="0" y="176" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Started"]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="110" y="176" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{STARTED}]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="0" y="198" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Completed"]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="110" y="198" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{COMPLETED}]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="0" y="220" width="105" height="18"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA["Evidence items"]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="110" y="220" width="405" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{EVIDENCE_COUNT}]]></textFieldExpression></textField>
+    </band></groupHeader></group>
+    <title><band height="55">
+        <textField isBlankWhenNull="true"><reportElement x="0" y="0" width="515" height="32"/><textElement><font size="20" isBold="true"/></textElement><textFieldExpression><![CDATA["SERVICE REPORT"]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="0" y="35" width="515" height="18"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["Work order: " + $P{ORDER_ID}]]></textFieldExpression></textField>
+    </band></title>
+    <pageHeader><band height="0"/></pageHeader>
+    <columnHeader><band height="0"/></columnHeader>
+    <detail><band height="72">
+        <textField isBlankWhenNull="true"><reportElement x="0" y="2" width="85" height="16"/><textElement><font size="10" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{kind}]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="90" y="2" width="425" height="16"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$F{id}]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="90" y="22" width="425" height="20"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$F{notes}]]></textFieldExpression></textField>
+        <textField isBlankWhenNull="true"><reportElement x="90" y="46" width="425" height="16"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA[$F{createdAt}]]></textFieldExpression></textField>
+    </band></detail>
+    <pageFooter><band height="22">
+        <textField isBlankWhenNull="true"><reportElement x="0" y="2" width="515" height="16"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA["ServiceEvidence • Page " + $V{PAGE_NUMBER}]]></textFieldExpression></textField>
+    </band></pageFooter>
+    <summary><band height="0"/></summary>
+
+</jasperReport>

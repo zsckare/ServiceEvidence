@@ -30,8 +30,17 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation 'org.flywaydb:flyway-database-postgresql'
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
-	implementation 'org.apache.pdfbox:pdfbox:3.0.6'
-	implementation("org.apache.pdfbox:pdfbox:3.0.6")
+
+	// EN: JasperReports engine and PDF exporter.
+// ES: Motor de JasperReports y exportación a PDF.
+	implementation('net.sf.jasperreports:jasperreports:6.16.0') {
+		exclude group: 'com.lowagie', module: 'itext'
+	}
+
+	implementation 'com.lowagie:itext:2.1.7'
+	implementation 'net.sf.jasperreports:jasperreports-fonts:6.16.0'
+	implementation 'net.sf.jasperreports:jasperreports-functions:6.16.0'
+
 	implementation 'tools.jackson.module:jackson-module-kotlin'
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
