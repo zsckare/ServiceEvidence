@@ -1,6 +1,8 @@
 package com.serviceevidence.backend.workorders
 
 import com.serviceevidence.backend.customers.CustomerRepository
+import com.serviceevidence.backend.notifications.NotificationRepository
+import com.serviceevidence.backend.notifications.ServiceNotification
 import com.serviceevidence.backend.identity.MembershipRepository
 import com.serviceevidence.backend.locations.LocationRepository
 import com.serviceevidence.backend.shared.tenant.TenantAccess
@@ -33,7 +35,7 @@ fun WorkOrder.view() = WorkOrderView(id,customerId,locationId,title,description,
 
 /** EN: Work orders and transitions. ES: Órdenes y transiciones auditables. */
 @RestController @RequestMapping("/api/v1/work-orders")
-class WorkOrdersController(private val access: TenantAccess, private val orders: WorkOrderRepository, private val customers: CustomerRepository, private val locations: LocationRepository, private val memberships: MembershipRepository, private val assignments: WorkOrderAssignmentRepository, private val events: WorkOrderEventRepository) {
+class WorkOrdersController(private val access: TenantAccess, private val orders: WorkOrderRepository, private val customers: CustomerRepository, private val locations: LocationRepository, private val memberships: MembershipRepository, private val assignments: WorkOrderAssignmentRepository, private val events: WorkOrderEventRepository, private val notifications: NotificationRepository) {
  private fun actor(jwt: Jwt) = UUID.fromString(jwt.subject)
  private fun order(tenant: UUID, id: UUID) = orders.findByTenantIdAndId(tenant,id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
  private fun log(o: WorkOrder, jwt: Jwt, action: String, details: String? = null) { events.save(WorkOrderEvent(tenantId=o.tenantId,workOrderId=o.id,actorId=actor(jwt),action=action,details=details)) }
@@ -94,7 +96,7 @@ class WorkOrdersController(private val access: TenantAccess, private val orders:
   if(member?.enabled!=true || member.role!="TECHNICIAN") throw ResponseStatusException(HttpStatus.BAD_REQUEST,"Not an active technician in tenant")
   if(assignments.existsByTenantIdAndWorkOrderIdAndTechnicianId(tenant,id,input.technicianId)) throw ResponseStatusException(HttpStatus.CONFLICT,"Already assigned")
   if(input.primary && assignments.findAllByTenantIdAndWorkOrderId(tenant,id).any { it.primary }) throw ResponseStatusException(HttpStatus.CONFLICT,"Primary technician already assigned")
-  val a=assignments.save(WorkOrderAssignment(tenantId=tenant,workOrderId=id,technicianId=input.technicianId,primary=input.primary));log(o,jwt,"ASSIGNED",input.technicianId.toString());return AssignmentView(a.id,a.technicianId,a.primary)
+  val a=assignments.save(WorkOrderAssignment(tenantId=tenant,workOrderId=id,technicianId=input.technicianId,primary=input.primary));log(o,jwt,"ASSIGNED",input.technicianId.toString());notifications.save(ServiceNotification(tenantId=tenant,userId=input.technicianId,title="New work order assignment",message="Assigned to: ${o.title}"));return AssignmentView(a.id,a.technicianId,a.primary)
  }
  @DeleteMapping("/{id}/assignments/{technicianId}") @ResponseStatus(HttpStatus.NO_CONTENT) @Transactional fun unassign(@AuthenticationPrincipal jwt: Jwt,@PathVariable id: UUID,@PathVariable technicianId: UUID) {
   val tenant=access.require(jwt,"TENANT_ADMIN","SUPERVISOR");val o=order(tenant,id)
