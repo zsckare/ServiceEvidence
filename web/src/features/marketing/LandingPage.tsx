@@ -14,6 +14,7 @@ import {
     XClose,
 } from '@untitledui/icons';
 import { useState } from 'react';
+// @ts-ignore - CSS imports are handled by the bundler/tooling setup
 import './landing.css';
 
 const features = [

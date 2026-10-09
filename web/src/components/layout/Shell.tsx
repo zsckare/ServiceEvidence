@@ -3,7 +3,11 @@ import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
 import { Bell01, Building07, ClipboardCheck, Home01, LogOut01, Menu01, Users01, XClose } from '@untitledui/icons';
 import type { User } from '../../api';
 import { Brand, Button } from '../ui/primitives';
-import { Customers, Dashboard, Notifications, Orders } from '../../features/operations/OperationsPages';
+import { Dashboard, Notifications } from '../../features/operations/OperationsPages';
+import { CustomersPage } from '../../features/operations/CustomersPage';
+import { LocationsPage } from '../../features/operations/LocationsPage';
+import { OrdersPage } from '../../features/operations/OrdersPage';
+import { OrderDetailPage } from '../../features/operations/OrderDetailPage';
 
 const menu = [
     { to: '/app', label: 'Resumen', icon: Home01 },
@@ -52,8 +56,10 @@ export function Shell({ user, tenant, onLogout, onSwitch }: { user: User; tenant
       <main className="main-content">
       <Routes>
       <Route path="/" element={<Dashboard />} />
-      <Route path="/orders" element={<Orders />} />
-      <Route path="/customers" element={<Customers />} />
+      <Route path="/orders" element={<OrdersPage />} />
+      <Route path="/orders/:orderId" element={<OrderDetailPage />} />
+      <Route path="/customers" element={<CustomersPage />} />
+      <Route path="/customers/:customerId/locations" element={<LocationsPage />} />
       <Route path="/notifications" element={<Notifications />} />
       <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

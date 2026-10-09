@@ -109,3 +109,46 @@ export const auth = {
 export const platform = {
     tenants: () => request<TenantInfo[]>('/platform/tenants'),
 };
+
+// EN: DTOs match Spring Boot controllers. ES: Contratos del backend actual.
+export type CustomerInput = {
+    name: string; legalName: string | null; taxId: string | null;
+    email: string | null; phone: string | null; notes: string | null; active: boolean;
+};
+export type Location = {
+    id: string; customerId: string; name: string; addressLine1: string;
+    addressLine2: string | null; city: string; state: string | null;
+    postalCode: string | null; country: string; contactName: string | null;
+    contactPhone: string | null; notes: string | null; active: boolean;
+};
+export type LocationInput = Omit<Location, 'id' | 'customerId'>;
+export type WorkOrderInput = {
+    title: string; customerId: string; locationId: string;
+    description: string | null; priority: string; scheduledAt: string | null;
+};
+export type Evidence = {
+    id: string; workOrderId: string; kind: string; contentType: string;
+    notes: string | null; createdAt: string; byteSize: number;
+};
+export type WorkOrderEvent = {
+    action: string; details: string | null; createdAt: string;
+};
+
+/** EN: Downloads private files with JWT; never exposes the bearer in URLs.
+ * ES: Descarga archivos privados sin poner el JWT en la URL.
+ */
+export async function downloadPrivateFile(path: string, filename: string): Promise<void> {
+    const headers = new Headers();
+    const accessToken = getAccessToken();
+    if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`);
+    const response = await fetch(`/api/v1${path}`, { headers });
+    if (!response.ok) throw new Error(`Error al descargar (${response.status}).`);
+    const url = URL.createObjectURL(await response.blob());
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
