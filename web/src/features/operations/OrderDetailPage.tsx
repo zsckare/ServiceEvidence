@@ -120,18 +120,18 @@ export function OrderDetailPage({ user }: { user: User }) {
                             <div><span>Creación</span><strong>{new Date(order.data.createdAt).toLocaleString('es-MX')}</strong></div>
                         </div>
                         {availableStatuses.length > 0 && (
-                        <form className="operation-inline-form" onSubmit={(event) => { event.preventDefault(); updateStatus.mutate(); }}>
-                            <label className="operation-field">
-                                <span>Cambiar estado</span>
-                                <select className="se-input" required value={status} onChange={(e) => setStatus(e.target.value)}>
-                                    <option value="">Seleccionar estado</option>
-                                    {availableStatuses.map((item) => (
-                                        <option key={item} value={item}>{item}</option>
-                                    ))}
-                                </select>
-                            </label>
-                            <Button type="submit" isDisabled={!status || updateStatus.isPending}>Actualizar</Button>
-                        </form>
+                            <form className="operation-inline-form" onSubmit={(event) => { event.preventDefault(); updateStatus.mutate(); }}>
+                                <label className="operation-field">
+                                    <span>Cambiar estado</span>
+                                    <select className="se-input" required value={status} onChange={(e) => setStatus(e.target.value)}>
+                                        <option value="">Seleccionar estado</option>
+                                        {availableStatuses.map((item) => (
+                                            <option key={item} value={item}>{item}</option>
+                                        ))}
+                                    </select>
+                                </label>
+                                <Button type="submit" isDisabled={!status || updateStatus.isPending}>Actualizar</Button>
+                            </form>
                         )}
                         <OperationError error={updateStatus.error} />
                     </Panel>
@@ -189,7 +189,11 @@ export function OrderDetailPage({ user }: { user: User }) {
             <Panel>
                 <h2>Historial de actividad</h2>
                 <ErrorOrLoading loading={events.isLoading} error={events.error}>
-                    {events.data?.length === 0 ? <Empty>Sin movimientos registrados.</Empty> : (
+                    {events.data?.length === 0 ? (
+                        <div className="rounded-xl border border-dashed border-gray-300 p-6 text-center text-sm text-gray-500">
+                            Sin movimientos registrados.
+                        </div>
+                    ) : (
                         <div className="operation-event-list">
                             {events.data?.map((event, index) => (
                                 <div key={`${event.createdAt}-${index}`}>

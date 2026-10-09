@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ArrowRight, Building07, LogOut01, SearchLg, Shield01 } from '@untitledui/icons';
-import { auth, platform, type TenantInfo } from '../../api';
+import { auth, platform, request, type TenantInfo } from '../../api';
 import { Alert, Brand, Button, Empty, ErrorOrLoading, Header, Panel, Status } from '../../components/ui/primitives';
 
 export function AdminChoice({ onGlobal, onTenant, onLogout }: { onGlobal: () => void; onTenant: () => void; onLogout: () => void }) {
@@ -81,6 +81,17 @@ export function TenantPicker({ isAdmin, onSelected, onBack }: { isAdmin: boolean
 }
 
 export function PlatformDashboard({ onChooseTenant, onLogout }: { onChooseTenant: () => void; onLogout: () => void }) {
+  const queryClient = useQueryClient();
+  const [creating, setCreating] = useState(false);
+  const [newTenant, setNewTenant] = useState({ name: '', code: '', adminName: '', adminEmail: '', adminPassword: '' });
+  const create = useMutation({
+    mutationFn: () => request<TenantInfo>('/platform/tenants', { method: 'POST', body: JSON.stringify(newTenant) }),
+    onSuccess: async () => { setCreating(false); setNewTenant({ name: '', code: '', adminName: '', adminEmail: '', adminPassword: '' }); await queryClient.invalidateQueries({ queryKey: ['platform-tenants'] }); },
+  });
+  const toggle = useMutation({
+    mutationFn: ({ id, active }: { id: string; active: boolean }) => request<TenantInfo>(`/platform/tenants/${id}/status`, { method: 'PATCH', body: JSON.stringify({ active }) }),
+    onSuccess: async () => { await queryClient.invalidateQueries({ queryKey: ['platform-tenants'] }); },
+  });
   const data = useQuery({ queryKey: ['platform-tenants'], queryFn: platform.tenants });
   return <div className="workspace">
       <aside className="sidebar sidebar--desktop">
@@ -98,6 +109,22 @@ export function PlatformDashboard({ onChooseTenant, onLogout }: { onChooseTenant
       <main className="main-content">
       <Header title="Administración global" subtitle="Gestiona los espacios de trabajo de ServiceEvidence." actions={<Button onPress={onChooseTenant}>
       <Building07 size={17} /> Entrar a una empresa</Button>} />
+      <div className="admin-platform-actions"><Button onPress={() => setCreating((value) => !value)}>{creating ? 'Cancelar' : 'Nueva empresa'}</Button></div>
+      {creating && <Panel>
+        <h2>Registrar empresa</h2>
+        <form className="admin-form" onSubmit={(event) => { event.preventDefault(); create.mutate(); }}>
+          {([
+            ['name', 'Nombre de empresa'], ['code', 'Clave única'], ['adminName', 'Nombre del administrador'],
+            ['adminEmail', 'Correo del administrador'], ['adminPassword', 'Contraseña inicial (mínimo 12 caracteres)'],
+          ] as const).map(([field, label]) => <label key={field}>{label}
+            <input className="se-input" required minLength={field === 'adminPassword' ? 12 : undefined}
+              type={field === 'adminPassword' ? 'password' : field === 'adminEmail' ? 'email' : 'text'}
+              value={newTenant[field]} onChange={(event) => setNewTenant({ ...newTenant, [field]: event.target.value })} />
+          </label>)}
+          {create.error && <Alert>{create.error.message}</Alert>}
+          <Button type="submit" isDisabled={create.isPending}>Crear empresa</Button>
+        </form>
+      </Panel>}
       <div className="stats-grid">
       <Panel className="stat">
       <span>Empresas registradas</span>
@@ -110,6 +137,7 @@ export function PlatformDashboard({ onChooseTenant, onLogout }: { onChooseTenant
       <small>Disponibles para operar</small>
       </Panel>
       </div>
+      {toggle.error && <Alert>{toggle.error.message}</Alert>}
       <Panel>
       <div className="panel-heading">
       <h2>Empresas</h2>
@@ -123,6 +151,7 @@ export function PlatformDashboard({ onChooseTenant, onLogout }: { onChooseTenant
       <th>Empresa</th>
       <th>Clave</th>
       <th>Estado</th>
+      <th>Acciones</th>
       </tr>
       </thead>
       <tbody>{data.data?.map(t => <tr key={t.id}>
@@ -133,6 +162,9 @@ export function PlatformDashboard({ onChooseTenant, onLogout }: { onChooseTenant
       <td>
       <Status active={t.active} label={t.active ? 'Activa' : 'Inactiva'} />
       </td>
+      <td><Button variant="secondary" isDisabled={toggle.isPending} onPress={() => {
+        if (window.confirm(`¿${t.active ? 'Suspender' : 'Activar'} ${t.name}?`)) toggle.mutate({ id: t.id, active: !t.active });
+      }}>{t.active ? 'Suspender' : 'Activar'}</Button></td>
       </tr>)}</tbody>
       </table>
       </div>

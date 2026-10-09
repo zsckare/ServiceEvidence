@@ -8,12 +8,16 @@ import { CustomersPage } from '../../features/operations/CustomersPage';
 import { LocationsPage } from '../../features/operations/LocationsPage';
 import { OrdersPage } from '../../features/operations/OrdersPage';
 import { OrderDetailPage } from '../../features/operations/OrderDetailPage';
+import { UsersPage } from '../../features/admin/UsersPage';
+import { SettingsPage } from '../../features/admin/SettingsPage';
 
 const menu = [
     { to: '/app', label: 'Resumen', icon: Home01 },
     { to: '/app/orders', label: 'Órdenes de trabajo', icon: ClipboardCheck },
     { to: '/app/customers', label: 'Clientes', icon: Users01 },
     { to: '/app/notifications', label: 'Notificaciones', icon: Bell01 },
+    { to: '/app/users', label: 'Usuarios y roles', icon: Users01 },
+    { to: '/app/settings', label: 'Configuración', icon: Building07 },
 ];
 
 export function Shell({ user, tenant, onLogout, onSwitch }: { user: User; tenant: string; onLogout: () => void; onSwitch?: () => void }) {
@@ -61,6 +65,8 @@ export function Shell({ user, tenant, onLogout, onSwitch }: { user: User; tenant
       <Route path="/customers" element={<CustomersPage />} />
       <Route path="/customers/:customerId/locations" element={<LocationsPage />} />
       <Route path="/notifications" element={<Notifications />} />
+      <Route path="/users" element={<UsersPage />} />
+      <Route path="/settings" element={<SettingsPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       </main>

@@ -20,6 +20,8 @@ data class CreateUserRequest(
  @field:Size(min=12) val password: String,
  val role: String
 )
+data class UpdateMemberRequest(val role: String? = null, val enabled: Boolean? = null)
+
 data class MemberView(val id: UUID, val email: String, val fullName: String, val role: String, val enabled: Boolean)
 
 /** EN: All queries are scoped to the tenant in a signed JWT. ES: Consultas limitadas al tenant del JWT firmado. */
@@ -48,6 +50,33 @@ class TenantUsersController(
    users.findById(m.userId).orElse(null)?.let { MemberView(it.id,it.email,it.fullName,m.role,m.enabled) }
   }
  }
+ /** EN: Update tenant membership only, never the global user account.
+  * ES: Modifica únicamente la membresía del tenant, no la cuenta global.
+  */
+ @PatchMapping("/{userId}") @Transactional
+ fun update(@AuthenticationPrincipal jwt: Jwt, @PathVariable userId: UUID,
+            @RequestBody req: UpdateMemberRequest): MemberView {
+  val tenantId = authorizedTenant(jwt)
+  val membership = memberships.findByUserIdAndTenantId(userId, tenantId)
+   ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Membership not found")
+  val member = users.findById(userId).orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
+  if (req.role == null && req.enabled == null)
+   throw ResponseStatusException(HttpStatus.BAD_REQUEST, "No changes requested")
+  if (req.role != null && req.role !in setOf("TENANT_ADMIN", "SUPERVISOR", "TECHNICIAN", "CLIENT"))
+   throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role")
+  // EN: Prevent an administrator from removing their own tenant admin access.
+  // ES: Evita que un administrador se quite a sí mismo el acceso administrativo.
+  if (userId.toString() == jwt.subject &&
+      (req.enabled == false || (req.role != null && req.role != "TENANT_ADMIN")))
+   throw ResponseStatusException(HttpStatus.CONFLICT, "Cannot revoke your own administrator access")
+  req.role?.let { membership.role = it }
+  req.enabled?.let { membership.enabled = it }
+  memberships.save(membership)
+  audits.save(SecurityAudit(actorUserId=UUID.fromString(jwt.subject), tenantId=tenantId,
+   action="MEMBERSHIP_UPDATED", targetId=userId.toString()))
+  return MemberView(member.id, member.email, member.fullName, membership.role, membership.enabled)
+ }
+
  @PostMapping @ResponseStatus(HttpStatus.CREATED) @Transactional
  fun create(@AuthenticationPrincipal jwt: Jwt, @Valid @RequestBody req: CreateUserRequest): MemberView {
   val tenantId = authorizedTenant(jwt)
