@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.UUID
+import org.springframework.jdbc.core.JdbcTemplate
 
 data class CreateTenantRequest(
  @field:NotBlank val name: String,
@@ -29,7 +30,7 @@ data class StatusRequest(val active: Boolean)
 class PlatformTenantController(
  private val tenants: TenantRepository, private val users: UserRepository,
  private val memberships: MembershipRepository, private val passwords: PasswordEncoder,
- private val audits: AuditRepository
+ private val audits: AuditRepository, private val jdbc: JdbcTemplate
 ) {
  @GetMapping fun list(): List<TenantView> = tenants.findAll().map { TenantView(it.id,it.code,it.name,it.active) }
  @PostMapping @ResponseStatus(HttpStatus.CREATED) @Transactional
@@ -40,6 +41,8 @@ class PlatformTenantController(
   val email = req.adminEmail.trim().lowercase()
   if (users.findByEmail(email) != null) throw ResponseStatusException(HttpStatus.CONFLICT,"Admin email already exists")
   val tenant = tenants.save(Tenant(code=code,name=req.name.trim()))
+  // EN: New tenants start on Starter. ES: Los nuevos tenants inician en Starter.
+  jdbc.update("INSERT INTO tenant_subscriptions (tenant_id, plan_code) VALUES (?, ?)", tenant.id, "STARTER")
   val admin = users.save(PlatformUser(email=email,fullName=req.adminName.trim(),passwordHash=requireNotNull(passwords.encode(req.adminPassword)) { "Password encoder returned null" }))
   memberships.save(TenantMembership(tenantId=tenant.id,userId=admin.id,role="TENANT_ADMIN"))
   audits.save(SecurityAudit(actorUserId=UUID.fromString(jwt.subject),tenantId=tenant.id,action="TENANT_CREATED",targetId=tenant.id.toString()))

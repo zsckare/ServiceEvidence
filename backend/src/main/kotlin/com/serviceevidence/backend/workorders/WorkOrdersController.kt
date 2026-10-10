@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.time.Instant
 import java.util.UUID
+import com.serviceevidence.backend.subscriptions.SubscriptionQuotaService
 
 private val priorities = setOf("LOW", "MEDIUM", "HIGH", "URGENT")
 private val statuses = setOf("DRAFT", "SCHEDULED", "IN_PROGRESS", "COMPLETED", "CANCELLED")
@@ -35,7 +36,7 @@ fun WorkOrder.view() = WorkOrderView(id,customerId,locationId,title,description,
 
 /** EN: Work orders and transitions. ES: Órdenes y transiciones auditables. */
 @RestController @RequestMapping("/api/v1/work-orders")
-class WorkOrdersController(private val access: TenantAccess, private val orders: WorkOrderRepository, private val customers: CustomerRepository, private val locations: LocationRepository, private val memberships: MembershipRepository, private val assignments: WorkOrderAssignmentRepository, private val events: WorkOrderEventRepository, private val notifications: NotificationRepository) {
+class WorkOrdersController(private val access: TenantAccess, private val orders: WorkOrderRepository, private val customers: CustomerRepository, private val locations: LocationRepository, private val memberships: MembershipRepository, private val assignments: WorkOrderAssignmentRepository, private val events: WorkOrderEventRepository, private val notifications: NotificationRepository, private val quotas: SubscriptionQuotaService) {
  private fun actor(jwt: Jwt) = UUID.fromString(jwt.subject)
  private fun order(tenant: UUID, id: UUID) = orders.findByTenantIdAndId(tenant,id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
  private fun log(o: WorkOrder, jwt: Jwt, action: String, details: String? = null) { events.save(WorkOrderEvent(tenantId=o.tenantId,workOrderId=o.id,actorId=actor(jwt),action=action,details=details)) }
@@ -67,6 +68,7 @@ class WorkOrdersController(private val access: TenantAccess, private val orders:
  }
  @PostMapping @ResponseStatus(HttpStatus.CREATED) @Transactional fun create(@AuthenticationPrincipal jwt: Jwt,@Valid @RequestBody input: WorkOrderInput): WorkOrderView {
   val tenant=access.require(jwt,"TENANT_ADMIN","SUPERVISOR");validate(input);verifyLocation(tenant,input.customerId,input.locationId)
+  quotas.requireWorkOrderSlot(tenant)
   val o=orders.save(WorkOrder(tenantId=tenant,customerId=input.customerId,locationId=input.locationId,title=input.title.trim(),description=input.description,priority=input.priority,scheduledAt=input.scheduledAt,createdBy=actor(jwt)))
   log(o,jwt,"CREATED");return o.view()
  }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import com.serviceevidence.backend.tenants.TenantRepository
 import java.util.UUID
+import com.serviceevidence.backend.subscriptions.SubscriptionQuotaService
 
 data class CreateUserRequest(
  @field:Email val email: String,
@@ -29,7 +30,7 @@ data class MemberView(val id: UUID, val email: String, val fullName: String, val
 class TenantUsersController(
  private val users: UserRepository, private val memberships: MembershipRepository,
  private val tenants: TenantRepository, private val passwords: PasswordEncoder,
- private val audits: AuditRepository
+ private val audits: AuditRepository, private val quotas: SubscriptionQuotaService
 ) {
  private fun authorizedTenant(jwt: Jwt): UUID {
   val tenantId = jwt.getClaimAsString("tenant_id")?.let(UUID::fromString)
@@ -70,6 +71,7 @@ class TenantUsersController(
       (req.enabled == false || (req.role != null && req.role != "TENANT_ADMIN")))
    throw ResponseStatusException(HttpStatus.CONFLICT, "Cannot revoke your own administrator access")
   req.role?.let { membership.role = it }
+  if (req.enabled == true && !membership.enabled) quotas.requireUserSlot(tenantId)
   req.enabled?.let { membership.enabled = it }
   memberships.save(membership)
   audits.save(SecurityAudit(actorUserId=UUID.fromString(jwt.subject), tenantId=tenantId,
@@ -84,6 +86,7 @@ class TenantUsersController(
    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role")
   val email = req.email.trim().lowercase()
   if (users.findByEmail(email) != null) throw ResponseStatusException(HttpStatus.CONFLICT,"Email already registered")
+  quotas.requireUserSlot(tenantId)
   val user = users.save(PlatformUser(email=email,fullName=req.fullName.trim(),passwordHash=requireNotNull(passwords.encode(req.password)) { "Password encoder returned null" }))
   if (memberships.findByUserIdAndTenantId(user.id,tenantId) != null)
    throw ResponseStatusException(HttpStatus.CONFLICT,"Membership already exists")
