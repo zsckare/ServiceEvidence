@@ -19,13 +19,14 @@ data class BillingSubscription(val tenantId: UUID, val planCode: String, val sta
     val period: String, val periodStart: OffsetDateTime, val periodEnd: OffsetDateTime,
     val trialEndsAt: OffsetDateTime?, val cancelAtPeriodEnd: Boolean)
 data class BillingInvoice(val id: UUID, val number: String, val planCode: String, val status: String,
-    val currency: String, val amountMinor: Long, val issuedAt: OffsetDateTime,
+    val currency: String, val amountMinor: Long, val paidAmountMinor: Long, val balanceMinor: Long, val issuedAt: OffsetDateTime,
     val dueAt: OffsetDateTime, val paidAt: OffsetDateTime?)
 data class BillingPayment(val id: UUID, val invoiceId: UUID, val amountMinor: Long,
     val currency: String, val method: String, val reference: String?, val recordedAt: OffsetDateTime)
 data class StartTrialRequest(val days: Int = 14)
 data class IssueInvoiceRequest(val dueDays: Int = 15)
-data class RecordPaymentRequest(val method: String, val reference: String? = null)
+data class RecordPaymentRequest(val method: String, val reference: String? = null,
+    val amountMinor: Long? = null, val idempotencyKey: String? = null)
 data class CancelSubscriptionRequest(val atPeriodEnd: Boolean = true)
 
 @RestController
@@ -125,19 +126,48 @@ class BillingController(private val jdbc: JdbcTemplate, private val access: Tena
         val method = body.method.uppercase()
         if (method !in setOf("BANK_TRANSFER", "CASH", "OTHER")) badRequest("Invalid payment method")
         if (body.reference != null && body.reference.length > 120) badRequest("Reference too long")
-        val invoice = jdbc.query("""SELECT amount_minor, currency, status FROM billing_invoices
-            WHERE id=? AND tenant_id=? FOR UPDATE""", { rs, _ -> Triple(rs.getLong(1), rs.getString(2), rs.getString(3)) }, invoiceId, tenantId)
-            .firstOrNull() ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Invoice not found")
-        if (invoice.third != "OPEN") conflict("Invoice already settled or void")
+        if (body.idempotencyKey != null && (body.idempotencyKey.isBlank() || body.idempotencyKey.length > 120))
+            badRequest("Invalid idempotency key")
+        // EN: Lock the invoice before calculating the remaining balance.
+        // ES: Bloquear la factura antes de calcular el saldo restante.
+        val invoice = jdbc.query("""SELECT amount_minor, paid_amount_minor, currency, status FROM billing_invoices
+            WHERE id=? AND tenant_id=? FOR UPDATE""", { rs, _ ->
+            InvoiceBalance(rs.getLong(1), rs.getLong(2), rs.getString(3), rs.getString(4))
+        }, invoiceId, tenantId).firstOrNull()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Invoice not found")
+        if (body.idempotencyKey != null) {
+            val existing = jdbc.query("""SELECT id, invoice_id, amount_minor, currency, method, external_reference, recorded_at
+                FROM billing_payments WHERE tenant_id=? AND idempotency_key=?""", { rs, _ -> BillingPayment(
+                rs.getObject("id", UUID::class.java), rs.getObject("invoice_id", UUID::class.java),
+                rs.getLong("amount_minor"), rs.getString("currency"), rs.getString("method"),
+                rs.getString("external_reference"), rs.getObject("recorded_at", OffsetDateTime::class.java)
+            ) }, tenantId, body.idempotencyKey).firstOrNull()
+            if (existing != null) {
+                if (existing.invoiceId != invoiceId || existing.method != method ||
+                    existing.reference != body.reference?.trim() ||
+                    (body.amountMinor != null && existing.amountMinor != body.amountMinor))
+                    conflict("Idempotency key already used for a different payment")
+                return existing
+            }
+        }
+        if (invoice.status !in setOf("OPEN", "PARTIALLY_PAID")) conflict("Invoice already settled or void")
+        val remaining = invoice.amount - invoice.paid
+        val amount = body.amountMinor ?: remaining
+        if (amount <= 0 || amount > remaining) badRequest("Payment exceeds remaining balance or is not positive")
         val paymentId = UUID.randomUUID()
         val actorId = runCatching { UUID.fromString(jwt.subject) }.getOrNull()
-        jdbc.update("""INSERT INTO billing_payments(id,invoice_id,tenant_id,amount_minor,currency,method,external_reference,recorded_by)
-            VALUES(?,?,?,?,?,?,?,?)""", paymentId, invoiceId, tenantId, invoice.first, invoice.second, method,
-            body.reference?.trim(), actorId)
-        jdbc.update("UPDATE billing_invoices SET status='PAID', paid_at=CURRENT_TIMESTAMP WHERE id=?", invoiceId)
-        event(tenantId, "PAYMENT_RECORDED", invoiceId.toString())
+        jdbc.update("""INSERT INTO billing_payments(id,invoice_id,tenant_id,amount_minor,currency,method,external_reference,recorded_by,idempotency_key)
+            VALUES(?,?,?,?,?,?,?,?,?)""", paymentId, invoiceId, tenantId, amount, invoice.currency, method,
+            body.reference?.trim(), actorId, body.idempotencyKey)
+        jdbc.update("""UPDATE billing_invoices SET paid_amount_minor=paid_amount_minor+?,
+            status=CASE WHEN paid_amount_minor+?=amount_minor THEN 'PAID' ELSE 'PARTIALLY_PAID' END,
+            paid_at=CASE WHEN paid_amount_minor+?=amount_minor THEN CURRENT_TIMESTAMP ELSE NULL END
+            WHERE id=? AND tenant_id=?""", amount, amount, amount, invoiceId, tenantId)
+        event(tenantId, "PAYMENT_RECORDED", "$invoiceId amount=$amount")
         return payments(tenantId).first { it.id == paymentId }
     }
+
+    private data class InvoiceBalance(val amount: Long, val paid: Long, val currency: String, val status: String)
 
     private fun lockSubscription(tenantId: UUID) {
         val found = jdbc.query("SELECT tenant_id FROM tenant_subscriptions WHERE tenant_id=? FOR UPDATE",
@@ -155,10 +185,10 @@ class BillingController(private val jdbc: JdbcTemplate, private val access: Tena
         .firstOrNull() ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
 
     private fun invoices(tenantId: UUID): List<BillingInvoice> = jdbc.query("""SELECT id, invoice_number, plan_code, status,
-        currency, amount_minor, issued_at, due_at, paid_at FROM billing_invoices WHERE tenant_id=? ORDER BY issued_at DESC""",
+        currency, amount_minor, paid_amount_minor, issued_at, due_at, paid_at FROM billing_invoices WHERE tenant_id=? ORDER BY issued_at DESC""",
         { rs, _ -> BillingInvoice(rs.getObject("id", UUID::class.java), rs.getString("invoice_number"), rs.getString("plan_code"),
-            rs.getString("status"), rs.getString("currency"), rs.getLong("amount_minor"),
-            rs.getObject("issued_at", OffsetDateTime::class.java), rs.getObject("due_at", OffsetDateTime::class.java),
+            rs.getString("status"), rs.getString("currency"), rs.getLong("amount_minor"), rs.getLong("paid_amount_minor"),
+            rs.getLong("amount_minor") - rs.getLong("paid_amount_minor"), rs.getObject("issued_at", OffsetDateTime::class.java), rs.getObject("due_at", OffsetDateTime::class.java),
             rs.getObject("paid_at", OffsetDateTime::class.java)) }, tenantId)
 
     private fun event(tenantId: UUID, type: String, details: String?) {
