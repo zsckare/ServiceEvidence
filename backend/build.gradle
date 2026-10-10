@@ -69,24 +69,22 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-tasks.register('postgresIntegrationTest', Test) {
-    description = 'Runs PostgreSQL integration tests'
-    group = 'verification'
+// EN: Run PostgreSQL integration tests separately from unit tests.
+// ES: Ejecuta las pruebas PostgreSQL separadas de las pruebas unitarias.
+tasks.named('test', Test) {
+    exclude '**/*PostgresIT.class'
+}
 
-    // Reutiliza las clases compiladas de src/test.
+tasks.register('postgresIntegrationTest', Test) {
+    description = 'Runs PostgreSQL integration tests against a dedicated *_test database'
+    group = 'verification'
     testClassesDirs = sourceSets.test.output.classesDirs
     classpath = sourceSets.test.runtimeClasspath
-
-    // Compila las pruebas antes de ejecutarlas.
     dependsOn tasks.named('testClasses')
-
     useJUnitPlatform()
-
-    // Busca clases como SubscriptionQuotaPostgresIT.
     include '**/*PostgresIT.class'
-
+    failOnNoDiscoveredTests = true
     shouldRunAfter tasks.named('test')
-
     testLogging {
         events 'passed', 'skipped', 'failed'
         exceptionFormat 'full'
