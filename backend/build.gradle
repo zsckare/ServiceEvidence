@@ -68,3 +68,27 @@ allOpen {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.register('postgresIntegrationTest', Test) {
+    description = 'Runs PostgreSQL integration tests'
+    group = 'verification'
+
+    // Reutiliza las clases compiladas de src/test.
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+
+    // Compila las pruebas antes de ejecutarlas.
+    dependsOn tasks.named('testClasses')
+
+    useJUnitPlatform()
+
+    // Busca clases como SubscriptionQuotaPostgresIT.
+    include '**/*PostgresIT.class'
+
+    shouldRunAfter tasks.named('test')
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat 'full'
+    }
+}
