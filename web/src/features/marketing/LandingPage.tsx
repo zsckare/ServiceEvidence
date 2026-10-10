@@ -18,36 +18,25 @@ import { useState } from 'react';
 import './landing.css';
 
 const features = [
-    {
-        number: '01',
-        icon: ClipboardCheck,
-        title: 'Órdenes bajo control',
-        description: 'Planifica, asigna y da seguimiento a cada servicio con un historial claro de su ejecución.',
-    },
-    {
-        number: '02',
-        icon: FileCheck02,
-        title: 'Evidencia en cada visita',
-        description: 'Centraliza fotografías, firmas y notas en el expediente de cada orden de trabajo.',
-    },
-    {
-        number: '03',
-        icon: LayersThree01,
-        title: 'Operación multiempresa',
-        description: 'Administra distintas organizaciones con información y permisos separados.',
-    },
-    {
-        number: '04',
-        icon: ShieldTick,
-        title: 'Reportes listos para entregar',
-        description: 'Genera reportes PDF profesionales con la información del servicio y la identidad de tu empresa.',
-    },
+    { number: '01', icon: ClipboardCheck, title: 'Órdenes y programación', description: 'Crea, programa y da seguimiento a los servicios. Asigna responsables y consulta cada cambio de estado.' },
+    { number: '02', icon: FileCheck02, title: 'Evidencia que respalda', description: 'Fotografías, firmas y archivos privados organizados por orden, con reportes PDF para entregar.' },
+    { number: '03', icon: Users01, title: 'Equipo conectado', description: 'Usuarios, técnicos y supervisores con roles definidos y una vista de servicios asignados.' },
+    { number: '04', icon: LayersThree01, title: 'Clientes y ubicaciones', description: 'Concentra la información de cada cliente, sus sedes y el historial de trabajos realizados.' },
+    { number: '05', icon: ShieldTick, title: 'Seguridad y auditoría', description: 'Acceso por organización, permisos por rol y registro de eventos de seguridad.' },
+    { number: '06', icon: Lock01, title: 'Planes y control de consumo', description: 'Administra planes, usuarios y límites mensuales desde una consola de plataforma.' },
 ];
 
 const steps = [
-    { number: '01', title: 'Organiza', description: 'Registra clientes, ubicaciones y servicios por realizar.' },
-    { number: '02', title: 'Ejecuta', description: 'Asigna técnicos y registra el avance de cada orden.' },
-    { number: '03', title: 'Respalda', description: 'Conserva evidencia y entrega un reporte profesional.' },
+    { number: '01', title: 'Organiza', description: 'Registra clientes, ubicaciones y crea órdenes con su programación.' },
+    { number: '02', title: 'Coordina', description: 'Asigna técnicos y supervisa el avance desde el dashboard.' },
+    { number: '03', title: 'Documenta', description: 'Adjunta fotografías, firmas y registra cada intervención.' },
+    { number: '04', title: 'Entrega', description: 'Genera un reporte PDF y conserva el historial del servicio.' },
+];
+
+const audiences = [
+    { label: 'Administradores', title: 'Visibilidad para decidir', description: 'Consulta indicadores, estados, órdenes recientes y actividad de la operación.' },
+    { label: 'Supervisores', title: 'Coordinación sin fricción', description: 'Da seguimiento a los servicios y mantén al equipo alineado con cada orden.' },
+    { label: 'Técnicos', title: 'El trabajo en un solo lugar', description: 'Accede a tus servicios asignados, consulta detalles y registra evidencias desde el móvil.' },
 ];
 
 /**
@@ -91,6 +80,7 @@ export function LandingPage() {
                         <a href="#plataforma" onClick={closeMenu}>La plataforma</a>
                         <a href="#funcionalidades" onClick={closeMenu}>Funcionalidades</a>
                         <a href="#como-funciona" onClick={closeMenu}>Cómo funciona</a>
+                        <a href="#equipos" onClick={closeMenu}>Para tu equipo</a>
                         <Link className="marketing-header-cta" to="/login" onClick={closeMenu}>
                             Iniciar sesión <ArrowUpRight size={16} />
                         </Link>
@@ -104,16 +94,16 @@ export function LandingPage() {
                         <div className="marketing-hero-copy">
                             <div className="marketing-pill">
                                 <span className="marketing-pill-dot" />
-                                Software para operaciones de servicio
+                                PLATAFORMA DE OPERACIONES EN CAMPO
                                 <ArrowRight size={14} />
                             </div>
                             <h1>
-                                La excelencia de tu servicio, <span>respaldada por evidencia.</span>
+                                Cada servicio, <span>bajo control y con evidencia.</span>
                             </h1>
                             <p className="marketing-lead">
-                                Convierte cada orden de trabajo en un proceso claro, trazable y profesional.
-                                Organiza a tu equipo, documenta cada intervención y entrega resultados
-                                que generan confianza.
+                                Centraliza clientes, órdenes, técnicos y evidencias en una sola plataforma.
+                                Supervisa tu operación, documenta cada visita y entrega reportes profesionales
+                                sin perder el contexto.
                             </p>
                             <div className="marketing-hero-actions">
                                 <a className="marketing-button marketing-button-primary" href="#funcionalidades">
@@ -124,9 +114,9 @@ export function LandingPage() {
                                 </Link>
                             </div>
                             <div className="marketing-assurances">
-                                <span><CheckCircle size={17} /> Órdenes centralizadas</span>
-                                <span><CheckCircle size={17} /> Evidencias digitales</span>
-                                <span><CheckCircle size={17} /> Reportes PDF</span>
+                                <span><CheckCircle size={17} /> Gestión multiempresa</span>
+                                <span><CheckCircle size={17} /> Técnicos y evidencias</span>
+                                <span><CheckCircle size={17} /> Reportes y auditoría</span>
                             </div>
                         </div>
 
@@ -155,8 +145,8 @@ export function LandingPage() {
                     <div className="marketing-container">
                         <div className="marketing-section-heading">
                             <div>
-                                <span className="marketing-overline">UNA PLATAFORMA. TODO EL PROCESO.</span>
-                                <h2>Menos fricción operativa.<br /><em>Más control sobre cada servicio.</em></h2>
+                                <span className="marketing-overline">TODO EL CICLO DE SERVICIO</span>
+                                <h2>Todo lo que tu equipo necesita.<br /><em>Una operación más conectada.</em></h2>
                             </div>
                             <p>Desde la planeación hasta la entrega del reporte, mantén conectadas a las personas, la información y las evidencias.</p>
                         </div>
@@ -167,7 +157,7 @@ export function LandingPage() {
                                     <article className="marketing-feature-card" key={feature.number}>
                                         <div className="marketing-feature-top">
                                             <span className="marketing-feature-icon"><Icon size={24} /></span>
-                                            <span className="marketing-feature-number">{feature.number} / 04</span>
+                                            <span className="marketing-feature-number">{feature.number} / 06</span>
                                         </div>
                                         <h3>{feature.title}</h3>
                                         <p>{feature.description}</p>
@@ -181,8 +171,8 @@ export function LandingPage() {
                 <section className="marketing-showcase-section">
                     <div className="marketing-container marketing-showcase-grid">
                         <div className="marketing-showcase-copy">
-                            <span className="marketing-overline">VISIBILIDAD EN TIEMPO REAL</span>
-                            <h2>La información correcta, <em>en el momento correcto.</em></h2>
+                            <span className="marketing-overline">SEGUIMIENTO OPERATIVO</span>
+                            <h2>Del trabajo en campo <em>a la evidencia entregada.</em></h2>
                             <p>Olvídate de buscar evidencias en conversaciones dispersas. Cada orden reúne su responsable, estado, historial y documentación.</p>
                             <ul>
                                 <li><CheckCircle size={19} /> Seguimiento del ciclo de vida de las órdenes</li>
@@ -208,8 +198,8 @@ export function LandingPage() {
                 <section className="marketing-section marketing-process-section" id="como-funciona">
                     <div className="marketing-container">
                         <div className="marketing-process-heading">
-                            <span className="marketing-overline">SIMPLE DE ENTENDER. POTENTE PARA OPERAR.</span>
-                            <h2>De la solicitud a la entrega.<br /><em>Sin perder el contexto.</em></h2>
+                            <span className="marketing-overline">UN FLUJO DE PRINCIPIO A FIN</span>
+                            <h2>De la planeación al reporte.<br /><em>Sin pasos perdidos.</em></h2>
                         </div>
                         <div className="marketing-process-grid">
                             {steps.map((step) => (
@@ -223,13 +213,41 @@ export function LandingPage() {
                     </div>
                 </section>
 
+                <section className="marketing-section marketing-audience-section" id="equipos">
+                    <div className="marketing-container">
+                        <div className="marketing-section-heading">
+                            <div>
+                                <span className="marketing-overline">UNA EXPERIENCIA PARA CADA ROL</span>
+                                <h2>Tu equipo conectado.<br /><em>Cada quien con lo que necesita.</em></h2>
+                            </div>
+                            <p>Un mismo flujo de servicio con vistas y permisos adecuados para la operación diaria.</p>
+                        </div>
+                        <div className="marketing-audience-grid">
+                            {audiences.map((audience) => (
+                                <article className="marketing-audience-card" key={audience.label}>
+                                    <span className="marketing-audience-label">{audience.label}</span>
+                                    <h3>{audience.title}</h3>
+                                    <p>{audience.description}</p>
+                                </article>
+                            ))}
+                        </div>
+                        <div className="marketing-platform-note">
+                            <span className="marketing-platform-note-icon"><ShieldTick size={24} /></span>
+                            <div>
+                                <strong>Diseñado para operar con varias empresas</strong>
+                                <p>Información separada por organización, gestión de usuarios y roles, auditoría y administración central de planes y cuotas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <section className="marketing-cta-section">
                     <div className="marketing-container">
                         <div className="marketing-cta-panel">
                             <div className="marketing-cta-glow" />
                             <span className="marketing-overline">SERVICEEVIDENCE</span>
                             <h2>Tu trabajo habla por sí solo.<br /><em>Ahora también tiene evidencia.</em></h2>
-                            <p>Una forma más clara de administrar, documentar y respaldar tus operaciones de servicio.</p>
+                            <p>Órdenes, técnicos, clientes, evidencias y reportes reunidos en una plataforma profesional.</p>
                             <Link className="marketing-button marketing-button-light" to="/login">
                                 Ingresar a la plataforma <ArrowUpRight size={18} />
                             </Link>
