@@ -1,3 +1,4 @@
+import { FinancialDashboard } from './FinancialDashboard';
 import { SubscriptionManagement } from './SubscriptionManagement';
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -87,7 +88,7 @@ export function TenantPicker({ isAdmin, onSelected, onBack }: { isAdmin: boolean
  */
 export function PlatformDashboard({ onChooseTenant, onLogout }: { onChooseTenant: () => void; onLogout: () => void }) {
   const client = useQueryClient();
-  const [section, setSection] = useState<'overview' | 'tenants' | 'subscriptions'>('overview');
+  const [section, setSection] = useState<'overview' | 'tenants' | 'subscriptions' | 'finance'>('overview');
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [creating, setCreating] = useState(false);
@@ -113,11 +114,12 @@ export function PlatformDashboard({ onChooseTenant, onLogout }: { onChooseTenant
     (filter === 'all' || (filter === 'active' ? tenant.active : !tenant.active)) &&
     `${tenant.name} ${tenant.code}`.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()),
   );
-  const labels = { overview: 'Resumen general', tenants: 'Empresas', subscriptions: 'Suscripciones' };
+  const labels = { overview: 'Resumen general', tenants: 'Empresas', subscriptions: 'Suscripciones', finance: 'Finanzas' };
   const navigation = [
     { key: 'overview' as const, label: 'Resumen general', symbol: '◫' },
     { key: 'tenants' as const, label: 'Empresas', symbol: '▦' },
     { key: 'subscriptions' as const, label: 'Planes y consumo', symbol: '◈' },
+    { key: 'finance' as const, label: 'Finanzas', symbol: '▤' },
   ];
   function navigate(next: typeof section) { setSection(next); setMobileMenu(false); }
 
@@ -182,6 +184,7 @@ export function PlatformDashboard({ onChooseTenant, onLogout }: { onChooseTenant
           {companyTable}
         </>}
         {section === 'subscriptions' && <div className="console-subscriptions"><SubscriptionManagement tenants={all}/></div>}
+        {section === 'finance' && <FinancialDashboard />}
       </main>
     </div>
   </div>;
