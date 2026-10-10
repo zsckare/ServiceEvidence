@@ -1001,3 +1001,188 @@ tr:last-child td {
         flex-direction: column;
     }
 }
+
+/* EN: Subscription consumption indicators. ES: Indicadores de cuotas. */
+.subscription-details { display: grid; gap: 1.25rem; margin-top: 1rem; }
+.subscription-details p { color: var(--text-secondary, #756a68); margin: .35rem 0; }
+.subscription-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; margin-top: 1rem; }
+.subscription-controls label { display: grid; gap: .4rem; flex: 1 1 240px; font-size: .9rem; }
+.subscription-meter { display: grid; gap: .5rem; }
+.subscription-meter__heading { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.subscription-meter__track { width: 100%; height: .65rem; border-radius: 99px; overflow: hidden; background: #f4e3cc; }
+.subscription-meter__fill { height: 100%; background: #830423; border-radius: 99px; transition: width .2s ease; }
+.subscription-meter__fill--warning { background: #c57e7f; }
+
+
+/* EN: Premium platform console, scoped to SUPER_ADMIN only.
+   ES: Consola profesional aislada del panel operativo de cada tenant. */
+.console-layout { display:grid; grid-template-columns:252px minmax(0,1fr); min-height:100vh; background:#f9f7f5; color:#322a2b; }
+.console-sidebar { background:#fff; border-right:1px solid #ece5e1; display:flex; flex-direction:column; padding:26px 16px 18px; min-height:100vh; }
+.console-sidebar__brand { padding:4px 13px 35px; display:grid; gap:10px; }
+.console-sidebar__edition { color:#a08284; letter-spacing:2.3px; font-size:9px; font-weight:800; }
+.console-sidebar__group { display:grid; gap:5px; }
+.console-sidebar__group>span { font-size:10px; font-weight:800; letter-spacing:1.5px; color:#a79b9a; padding:0 14px 12px; }
+.console-nav { border:0; background:transparent; color:#6d6060; border-radius:10px; display:flex; gap:13px; align-items:center; padding:13px 14px; width:100%; font-size:13px; font-weight:650; cursor:pointer; text-align:left; }
+.console-nav:hover { background:#faf1f0; color:#830423; }
+.console-nav--active { background:#f9eeee; color:#830423; }
+.console-nav__symbol { font-size:19px; width:21px; text-align:center; line-height:1; }
+.console-sidebar__bottom { margin-top:auto; padding:20px 7px 0; border-top:1px solid #f0eae7; display:grid; gap:7px; }
+.console-sidebar__identity { display:flex; gap:10px; align-items:center; padding:0 4px 18px; }
+.console-sidebar__identity div { display:grid; gap:4px; min-width:0; }
+.console-sidebar__identity strong { font-size:12px; }
+.console-sidebar__identity small { color:#958a88; font-size:11px; }
+.console-sidebar__avatar { width:38px; height:38px; border-radius:11px; background:#f7e8e8; color:#830423; display:grid; place-items:center; flex-shrink:0; }
+.console-sidebar__button { display:flex; align-items:center; gap:10px; border:0; border-radius:9px; background:transparent; padding:11px; cursor:pointer; color:#756869; text-align:left; font-size:12px; }
+.console-sidebar__button:hover { background:#f9eeee; color:#830423; }
+.console-main { min-width:0; }
+.console-topbar { height:70px; background:#fff; border-bottom:1px solid #ece5e1; display:flex; align-items:center; justify-content:space-between; padding:0 clamp(18px,3vw,44px); gap:12px; }
+.console-breadcrumb { color:#9b8c8d; font-size:12px; }
+.console-breadcrumb span { margin:0 11px; color:#d0c3c0; }
+.console-breadcrumb strong { color:#4b3c3d; font-weight:700; }
+.console-topbar__role { display:flex; align-items:center; gap:7px; font-size:10px; letter-spacing:.6px; font-weight:800; color:#830423; background:#f9eeee; border-radius:50px; padding:8px 12px; }
+.console-content { width:min(100%,1400px); margin:0 auto; padding:36px clamp(18px,3vw,44px) 80px; display:grid; gap:25px; }
+.console-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.console-overline { color:#9a4651; font-size:10px; font-weight:850; letter-spacing:1.8px; }
+.console-heading h1 { font-size:clamp(25px,2.6vw,35px); line-height:1.15; color:#372b2c; letter-spacing:-1px; margin:9px 0; font-weight:750; }
+.console-heading p,.console-panel__header p,.console-section-title p { color:#96898a; font-size:13px; margin:5px 0 0; }
+.console-primary { background:#830423; color:#fff; border:1px solid #830423; border-radius:10px; padding:12px 17px; font-size:12px; font-weight:750; cursor:pointer; }
+.console-primary:hover { background:#59090e; }
+.console-primary:disabled { opacity:.6; cursor:wait; }
+.console-hero { min-height:216px; border-radius:17px; background:linear-gradient(115deg,#59090e,#830423 72%,#a44450); color:#fff; padding:33px 38px; display:flex; align-items:center; justify-content:space-between; gap:20px; overflow:hidden; }
+.console-hero__eyebrow { font-size:10px; letter-spacing:2px; color:#f2c6c6; font-weight:800; }
+.console-hero h2 { font-size:clamp(23px,2.6vw,32px); letter-spacing:-.8px; margin:11px 0; color:#fff; }
+.console-hero p { font-size:13px; color:#f3d7d6; max-width:420px; line-height:1.65; }
+.console-hero button { display:flex; align-items:center; gap:8px; background:#fff; color:#830423; border:0; border-radius:8px; padding:11px 14px; margin-top:19px; font-size:12px; font-weight:750; cursor:pointer; }
+.console-hero__visual { flex:0 0 160px; width:160px; height:160px; border:1px solid #ffffff33; border-radius:32px; transform:rotate(-12deg); display:grid; place-items:center; position:relative; background:#ffffff0d; box-shadow:0 0 0 24px #ffffff0a,0 0 0 50px #ffffff07; }
+.console-hero__visual>span { font-size:54px; color:#f4e3cc; font-weight:900; letter-spacing:-5px; }
+.console-kpis { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:17px; }
+.console-kpi { background:#fff; border:1px solid #eee7e4; border-radius:14px; min-height:150px; padding:22px 23px; display:flex; flex-direction:column; gap:9px; position:relative; }
+.console-kpi>span:first-child { color:#807576; font-size:12px; font-weight:600; }
+.console-kpi strong { color:#34292a; font-size:35px; font-weight:760; letter-spacing:-1px; line-height:1.15; }
+.console-kpi small { color:#a29594; font-size:11px; }
+.console-kpi__mark { position:absolute; right:20px; top:20px; background:#faf0ef; border-radius:10px; color:#830423; padding:10px; font-size:17px; }
+.console-kpis--compact .console-kpi { min-height:105px; }
+.console-section-title { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; }
+.console-section-title h2 { margin:0; font-size:18px; }
+.console-section-title button { border:0; background:transparent; color:#830423; font-size:12px; font-weight:750; cursor:pointer; display:flex; gap:7px; align-items:center; }
+.console-panel { background:#fff; border:1px solid #eee7e4; border-radius:14px; overflow:hidden; }
+.console-panel__header { display:flex; justify-content:space-between; align-items:center; padding:24px 25px; gap:15px; }
+.console-panel__header h2 { margin:6px 0 0; font-size:17px; color:#3b3030; }
+.console-count { color:#9c8c8b; background:#f9f6f4; border-radius:8px; padding:8px 11px; font-size:11px; white-space:nowrap; }
+.console-toolbar { display:flex; flex-wrap:wrap; gap:12px; padding:0 25px 20px; }
+.console-search { flex:1 1 250px; display:flex; align-items:center; gap:9px; padding:0 12px; border:1px solid #e9e0dc; border-radius:9px; color:#978a89; min-height:41px; }
+.console-search input { background:transparent; outline:0; border:0; width:100%; min-width:0; font-size:12px; color:#3c3131; }
+.console-filter { border:1px solid #e9e0dc; border-radius:9px; padding:0 12px; min-height:41px; background:#fff; color:#6c5f60; font-size:12px; }
+.console-table-wrap { width:100%; overflow-x:auto; }
+.console-table { width:100%; border-collapse:collapse; text-align:left; min-width:620px; }
+.console-table th { font-size:10px; letter-spacing:.5px; color:#988b89; background:#fbf9f8; font-weight:800; padding:14px 25px; }
+.console-table td { padding:17px 25px; border-top:1px solid #f2eeec; font-size:12px; }
+.console-table__action { text-align:right; }
+.console-company { display:flex; align-items:center; gap:12px; }
+.console-company__icon { width:38px; height:38px; border-radius:10px; background:#f9eeee; color:#830423; display:grid; place-items:center; flex-shrink:0; }
+.console-company>div { display:grid; gap:4px; }
+.console-company strong { color:#403233; font-size:12px; }
+.console-company small { color:#a29594; font-size:10px; }
+.console-table code { font-size:11px; background:#f8f5f3; border-radius:5px; padding:5px 7px; color:#756969; }
+.console-status { display:inline-flex; align-items:center; gap:7px; border-radius:30px; padding:6px 10px; font-size:10px; font-weight:750; white-space:nowrap; }
+.console-status span { width:6px; height:6px; border-radius:50%; background:currentColor; }
+.console-status--active { background:#eaf6ef; color:#248154; }
+.console-status--inactive { background:#fff0e8; color:#ad5b2e; }
+.console-link { color:#830423; border:0; background:transparent; cursor:pointer; font-weight:750; font-size:12px; }
+.console-link:disabled { opacity:.5; }
+.console-no-results { padding:24px; text-align:center; color:#9c8d8d; }
+.console-message { padding:12px 24px; }
+.console-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:17px; padding:0 25px 25px; }
+.console-form label { display:grid; gap:7px; font-size:12px; font-weight:700; color:#615354; }
+.console-form .se-input { width:100%; box-sizing:border-box; }
+.console-form__footer { grid-column:1/-1; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.console-form__footer span { color:#95898a; font-size:11px; }
+.console-subscriptions>.panel { border-radius:14px; border-color:#eee7e4; }
+.console-menu,.console-backdrop { display:none; }
+@media(max-width:900px) { .console-layout { grid-template-columns:1fr; } .console-sidebar { position:fixed; z-index:60; left:0; top:0; bottom:0; width:252px; transform:translateX(-110%); transition:transform .2s ease; box-shadow:15px 0 40px #00000013; } .console-sidebar--open { transform:translateX(0); } .console-backdrop { display:block; position:fixed; inset:0; z-index:59; background:#20171880; border:0; } .console-menu { display:block; background:transparent; border:0; color:#830423; font-size:22px; cursor:pointer; } }
+@media(max-width:640px) { .console-content { padding:24px 16px 60px; gap:19px; } .console-topbar { padding:0 16px; } .console-breadcrumb { font-size:10px; } .console-topbar__role { font-size:0; } .console-hero { padding:27px 23px; } .console-hero__visual { display:none; } .console-kpis { grid-template-columns:1fr; gap:10px; } .console-kpi { min-height:110px; } .console-panel__header { padding:20px 17px; } .console-toolbar { padding:0 17px 17px; } .console-form { grid-template-columns:1fr; padding:0 17px 20px; } }
+
+/* EN: Consistent inner spacing for cards that do not contain edge-to-edge tables.
+   ES: Espaciado consistente para tarjetas sin tablas de ancho completo. */
+.se-panel > .operation-form,
+.se-panel > .admin-form,
+.se-panel > .operation-inline-form,
+.se-panel > .operation-details,
+.se-panel > .operation-event-list,
+.se-panel > .operation-evidence-grid,
+.se-panel > .operation-upload,
+.se-panel > .operation-toolbar,
+.se-panel > .operation-actions,
+.se-panel > .operation-row-actions {
+    margin: 0;
+    padding: clamp(18px, 2vw, 26px);
+}
+.se-panel > .panel-heading + .operation-form,
+.se-panel > .panel-heading + .admin-form,
+.se-panel > .panel-heading + .operation-toolbar {
+    padding-top: 20px;
+}
+.se-panel > .se-alert,
+.se-panel > .loading,
+.se-panel > .empty {
+    margin: 18px;
+}
+.se-panel > .table-scroll,
+.se-panel > .pagination,
+.se-panel > .panel-heading {
+    margin: 0;
+}
+.se-panel > .operation-form > :last-child,
+.se-panel > .admin-form > :last-child {
+    margin-bottom: 0;
+}
+.session-restoring {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    color: #830423;
+    background: #faf8f6;
+    font-weight: 650;
+}
+@media (max-width: 640px) {
+    .se-panel > .operation-form,
+    .se-panel > .admin-form,
+    .se-panel > .operation-inline-form,
+    .se-panel > .operation-details,
+    .se-panel > .operation-event-list,
+    .se-panel > .operation-evidence-grid,
+    .se-panel > .operation-upload,
+    .se-panel > .operation-toolbar,
+    .se-panel > .operation-actions {
+        padding: 16px;
+    }
+}
+
+/* EN: Targeted inner spacing for subscription management and dashboard cards.
+ * ES: Espaciado interno específico sin afectar las tablas ni otros paneles. */
+.se-panel:has(> .subscription-details),
+.se-panel:has(> .subscription-controls) {
+    /* Subscription card keeps its existing full-width heading. */
+    padding-bottom: 24px;
+}
+.se-panel:has(> .subscription-details) > :not(.panel-heading),
+.se-panel:has(> .subscription-controls) > :not(.panel-heading) {
+    margin-left: 24px;
+    margin-right: 24px;
+}
+.analytics-layout > .se-panel {
+    padding: 24px;
+}
+.analytics-layout > .se-panel > h2:first-child {
+    margin-top: 0;
+}
+@media (max-width: 640px) {
+    .se-panel:has(> .subscription-details),
+    .se-panel:has(> .subscription-controls) { padding-bottom: 16px; }
+    .se-panel:has(> .subscription-details) > :not(.panel-heading),
+    .se-panel:has(> .subscription-controls) > :not(.panel-heading) {
+        margin-left: 16px;
+        margin-right: 16px;
+    }
+    .analytics-layout > .se-panel { padding: 16px; }
+}

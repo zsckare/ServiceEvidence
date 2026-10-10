@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { auth, getAccessToken, setAccessToken, type User } from './api';
@@ -6,6 +6,7 @@ import { Login } from './features/auth/Login';
 import { LandingPage } from './features/marketing/LandingPage';
 import { AdminChoice, PlatformDashboard, TenantPicker } from './features/platform/PlatformPages';
 import { Shell } from './components/layout/Shell';
+import { readSession, saveSession, type SessionContext } from './session';
 
 type Mode = 'choice' | 'picker' | 'platform' | 'tenant';
 type SelectedTenant = { id: string; name: string };
@@ -14,15 +15,54 @@ type SelectedTenant = { id: string; name: string };
  *  ES: Separa las páginas públicas de los contextos autenticados.
  */
 export default function App() {
-    const [user, setUser] = useState<User | null>(null);
-    const [tenant, setTenant] = useState<SelectedTenant | null>(null);
-    const [mode, setMode] = useState<Mode>('choice');
-    const [baseToken, setBaseToken] = useState<string | null>(null);
+    const [restored] = useState(() => readSession());
+    const [restoring, setRestoring] = useState(Boolean(restored));
+    const [user, setUser] = useState<User | null>(restored?.user ?? null);
+    const [tenant, setTenant] = useState<SelectedTenant | null>(restored?.tenant ?? null);
+    const [mode, setMode] = useState<Mode>(restored?.mode ?? 'choice');
+    const [baseToken, setBaseToken] = useState<string | null>(restored?.baseToken ?? null);
     const queryClient = useQueryClient();
     const navigate = useNavigate();
+    // EN: Restore the bearer token before the first render.
+    // ES: Restaura el token antes del primer renderizado.
+    if (restored && !getAccessToken()) setAccessToken(restored.activeToken);
     const authenticated = Boolean(user && getAccessToken());
 
+    useEffect(() => {
+        if (!restored) return;
+        let cancelled = false;
+        auth.me().then((freshUser) => {
+            if (cancelled) return;
+            setUser(freshUser);
+            setRestoring(false);
+        }).catch(() => {
+            if (cancelled) return;
+            setAccessToken(null);
+            saveSession(null);
+            setUser(null);
+            setTenant(null);
+            setBaseToken(null);
+            setRestoring(false);
+        });
+        return () => { cancelled = true; };
+        // EN: Validate once on initial mount, including React Strict Mode.
+        // ES: Valida al montar, también con React Strict Mode.
+    }, []);
+
+    useEffect(() => {
+        if (restoring) return;
+        if (!user || !baseToken || !getAccessToken()) {
+            saveSession(null);
+            return;
+        }
+        const state: SessionContext = {
+            user, baseToken, activeToken: getAccessToken()!, tenant, mode,
+        };
+        saveSession(state);
+    }, [user, baseToken, tenant, mode, restoring]);
+
     function logout() {
+        saveSession(null);
         setAccessToken(null);
         setBaseToken(null);
         setUser(null);
@@ -37,6 +77,7 @@ export default function App() {
         setTenant(null);
         setMode(next);
         queryClient.clear();
+        saveSession({ user: user!, baseToken: baseToken!, activeToken: baseToken!, tenant: null, mode: next });
         navigate(next === 'platform' ? '/platform' : '/select-tenant');
     }
 
@@ -46,6 +87,7 @@ export default function App() {
         setTenant(null);
         setMode(authenticatedUser.platformAdmin ? 'choice' : 'picker');
         queryClient.clear();
+        saveSession({ user: authenticatedUser, baseToken: token, activeToken: token, tenant: null, mode: authenticatedUser.platformAdmin ? 'choice' : 'picker' });
         navigate('/select-tenant');
     }
 
@@ -56,8 +98,11 @@ export default function App() {
         setTenant({ id, name });
         setMode('tenant');
         queryClient.clear();
+        saveSession({ user: user!, baseToken: baseToken!, activeToken: response.accessToken, tenant: { id, name }, mode: 'tenant' });
         navigate('/app');
     }
+
+    if (restoring) return <div className="session-restoring" role="status">Restaurando sesión…</div>;
 
     return (
         <Routes>
